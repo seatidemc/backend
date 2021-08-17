@@ -1,7 +1,6 @@
-from flask import Flask, request, jsonify, make_response
-from flask_restful import Api, Resource
-from werkzeug.exceptions import abort
-from apis.ecs import EcsSetstatus
+from flask import Flask, jsonify, make_response
+from flask_restful import Api
+from apis.ecs import EcsDescribe, EcsGetstatus, EcsSetstatus
 
 app = Flask(__name__)
 api = Api(app)
@@ -32,8 +31,17 @@ def unauthorizedError(err):
             'code': 401
         })
     )
+    
+NAME = 'ecs'
+VERSION = 'v1'
+PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
-api.add_resource(EcsSetstatus, '/api/ecs/v1/setstatus')
+api.add_resource(EcsSetstatus, PREFIX + 'setstatus')
+api.add_resource(EcsGetstatus, PREFIX + 'getstatus')
+api.add_resource(EcsDescribe, PREFIX + 'describe/price', endpoint = 'desc-pric')
+api.add_resource(EcsDescribe, PREFIX + "describe/instance", endpoint = 'desc-inst')
+api.add_resource(EcsDescribe, PREFIX + "describe/available", endpoint = 'desc-avai')
+api.add_resource(EcsDescribe, PREFIX + "describe/status", endpoint = 'desc-stat')
 
 if __name__ == '__main__':
     app.run(debug=True)

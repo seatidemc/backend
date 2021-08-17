@@ -2,12 +2,11 @@ from flask import jsonify
 from db import database
 import re
 import urllib.request
-import yaml
-import os
-import io
 
 NOT_ENOUGH_ARGUMENT = 'Not enough argument.'
 DATABASE_ERROR = 'Database error.'
+REQUEST_ERROR = 'Request error.'
+PARSE_ERROR = 'Parse error.'
 
 def ng(text=None):
     return jsonify({
@@ -23,7 +22,7 @@ def ok(text=None):
     
 def writeStatusHistory(status):
     ip = getIP()
-    ip = ip if ip else '0.0.0.0'
+    ip = ip or '0.0.0.0'
     with database() as d:
         cur = d.cursor()
         cur.execute('INSERT INTO history (status, created_at, created_by) VALUES ("%s", NOW(), "%s")' % (status, ip))
@@ -37,10 +36,3 @@ def getIP():
         if ip:
             return ip[0]
     return False
-
-def getcfg():
-    path = os.path.dirname(os.path.realpath(__file__))
-    yamlPath = os.path.join(path, "config.yml")
-    raw = io.open(yamlPath, 'r', encoding="utf-8").read()
-    cfg = yaml.load(raw, Loader=yaml.FullLoader)
-    return cfg

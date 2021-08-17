@@ -1,5 +1,5 @@
 import pymysql
-from fn import getcfg
+from conf import getcfg
 
 class database:
     def __init__(self):
