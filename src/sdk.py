@@ -1,5 +1,6 @@
+from json.decoder import JSONDecoder
 from aliyunsdkcore.client import AcsClient
-from aliyunsdkecs.request.v20140526 import DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
+from aliyunsdkecs.request.v20140526 import DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
 from conf import getcfg
 
 client = AcsClient(
@@ -20,12 +21,13 @@ def describePrice():
     request.set_SystemDiskSize(ecs['disksize'])
     request.set_ZoneId(ecs['zone'])
     request.set_SpotStrategy(ecs['strategy'])
+    response = client.do_action_with_exception(request)
     try:
-        response = client.do_action_with_exception(request)
+        s = str(response, encoding='utf-8') #type: ignore
+        return s
     except:
         return None
-    s = str(response, encoding='utf-8') #type: ignore
-    return s
+   
 
 def describeAvailable():
     request = DescribeAvailableResourceRequest.DescribeAvailableResourceRequest()
@@ -37,17 +39,53 @@ def describeAvailable():
     response = client.do_action_with_exception(request)
     try:
         s = str(response, encoding='utf-8') #type: ignore
+        return s
     except:
         return None
-    s = str(response, encoding='utf-8') #type: ignore
-    return s
+    
 
-def describeInstanceStatus():
+def describeInstanceStatus(id):
     request = DescribeInstanceStatusRequest.DescribeInstanceStatusRequest()
+    request.set_InstanceIds([id])
+    response = client.do_action_with_exception(request)
+    try:
+        s = str(response, encoding='utf-8') #type: ignore
+        return s
+    except:
+        return None
+    
+def createInstance():
+    request = CreateInstanceRequest.CreateInstanceRequest()
+    request.set_InstanceType(ecs['type'])
+    request.set_InternetChargeType(ecs['i_chargetype'])
+    request.set_InternetMaxBandwidthOut(ecs['i_bandwidth'])
+    request.set_SystemDiskCategory(ecs['disktype'])
+    request.set_SystemDiskSize(ecs['disksize'])
+    request.set_ZoneId(ecs['zone'])
+    request.set_SpotStrategy(ecs['strategy'])
+    request.set_ImageId(ecs['image'])
+    if ecs['password']:
+        request.set_Password(ecs['password'])
+    request.set_SpotPriceLimit(0)
     response = client.do_action_with_exception(request)
     try:
         s = str(response, encoding='utf-8') #type: ignore
     except:
         return None
-    s = str(response, encoding='utf-8') #type: ignore
     return s
+
+def allocateIp(id):
+    request = AllocatePublicIpAddressRequest.AllocatePublicIpAddressRequest()
+    request.set_InstanceId(id)
+    client.do_action_with_exception(request)
+    
+def startInstance(id):
+    request = StartInstanceRequest.StartInstanceRequest()
+    request.set_InstanceId(id)
+    client.do_action_with_exception(request)
+    
+def deleteInstance(id):
+    request = DeleteInstanceRequest.DeleteInstanceRequest()
+    request.set_Force(True)
+    request.set_InstanceId(id)
+    client.do_action_with_exception(request)

@@ -1,39 +1,62 @@
 from flask.json import JSONDecoder
+from aliyunsdkcore.acs_exception.exceptions import ServerException
 from flask_restful import Resource
 from flask import request
-from fn import DATABASE_ERROR, NOT_ENOUGH_ARGUMENT, PARSE_ERROR, REQUEST_ERROR, ng, ok, writeStatusHistory
+from fn import PARSE_ERROR, REQUEST_ERROR, getId, updateId, ng, ok, updateId, writeHistory
 from conf import getcfg
-from db import database
-from sdk import describeAvailable, describeInstanceStatus, describePrice
+from sdk import allocateIp, deleteInstance, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice
 
-class EcsSetstatus(Resource):
-    def post(self):
-        try:
-            status = request.form['status']
-        except:
-            return ng(NOT_ENOUGH_ARGUMENT)
-        try:
-            with database() as d:
-                cur = d.cursor()
-                cur.execute('UPDATE `ecs_status` SET status="%s" WHERE id=1' % status)
-                d.commit()
-            writeStatusHistory(status=status)
-            return ok()
-        except:
-            return ng(DATABASE_ERROR)
-
-class EcsGetstatus(Resource):
+class EcsAction(Resource):
     def get(self):
-        with database() as d:
-            cur = d.cursor()
-            cur.execute("SELECT * FROM `ecs_status` WHERE id=1")
-            r = cur.fetchone()
-            print(r)
-        if r:
-            return ok(r[1])
-        else:
-            return ng(DATABASE_ERROR)
-        
+        ep = request.endpoint
+        m = {
+            'act-new': self.new,
+            'act-delete': self.delete,
+            'act-init': self.init,
+            'act-start': self.start
+        }
+        return m[ep]() #type: ignore
+    
+    def init(self):
+        id = getId()
+        try:
+            allocateIp(id)
+            startInstance(id)
+            writeHistory(id, 'init')
+        except ServerException as e:
+            return ng(REQUEST_ERROR + " Details: " + str(e))
+        return ok()
+    
+    def start(self):
+        id = getId()
+        try:
+            startInstance(id)
+            writeHistory(id, 'start')
+        except ServerException as e:
+            return ng(REQUEST_ERROR + " Details: " + str(e))
+        return ok()
+    
+    def delete(self):
+        id = getId()
+        try:
+            deleteInstance(id)
+            writeHistory(id, 'delete')
+            updateId('')
+        except ServerException as e:
+            return ng(REQUEST_ERROR + " Details: " + str(e))
+        return ok()
+    
+    def new(self):
+        r = createInstance()
+        if not r:
+            return ng(REQUEST_ERROR)
+        de = JSONDecoder()
+        r = de.decode(r)
+        id = r.get('InstanceId')
+        if not id:
+            return ng('Failed to get InstanceId.')
+        return ok(r)
+
 class EcsDescribe(Resource):
     def get(self):
         ep = request.endpoint
@@ -51,7 +74,7 @@ class EcsDescribe(Resource):
             return ng(REQUEST_ERROR)
         de = JSONDecoder()
         r = de.decode(r)
-        price = r.get("PriceInfo").get("Price").get("TradePrice")
+        price = r.get('PriceInfo').get('Price').get('TradePrice')
         return ok(price)
     
     def instance(self):
@@ -70,7 +93,7 @@ class EcsDescribe(Resource):
         de = JSONDecoder()
         r = de.decode(r)
         try:
-            if len(r.get("AvailableZones").get("AvailableZone")) > 0:
+            if len(r.get('AvailableZones').get('AvailableZone')) > 0:
                 return ok(True)
             else:
                 return ok(False)
@@ -78,16 +101,19 @@ class EcsDescribe(Resource):
             return ng(PARSE_ERROR)
         
     def status(self):
-        r = describeInstanceStatus()
+        id = getId()
+        if not id:
+            return ng('Unable to find instance id in database.')
+        r = describeInstanceStatus(id)
         if not r:
             return ng(REQUEST_ERROR)
         de = JSONDecoder()
         r = de.decode(r)
         try:
-            st = r.get("InstanceStatuses").get("InstanceStatus")
+            st = r.get('InstanceStatuses').get('InstanceStatus')
             if len(st) > 0:
-                status = st[0].get("Status")
-                id = st[0].get("InstanceId")
+                status = st[0].get('Status')
+                id = st[0].get('InstanceId')
                 return ok({
                     'status': status,
                     id: id,

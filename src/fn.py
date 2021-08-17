@@ -20,12 +20,12 @@ def ok(text=None):
         'data': text
     })
     
-def writeStatusHistory(status):
+def writeHistory(id, action):
     ip = getIP()
     ip = ip or '0.0.0.0'
     with database() as d:
         cur = d.cursor()
-        cur.execute('INSERT INTO history (status, created_at, created_by) VALUES ("%s", NOW(), "%s")' % (status, ip))
+        cur.execute('INSERT INTO history (instance, action, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(id), action, ip))
         d.commit()
     pass
 
@@ -36,3 +36,19 @@ def getIP():
         if ip:
             return ip[0]
     return False
+
+def updateId(id):
+    with database() as d:
+        cur = d.cursor()
+        cur.execute("UPDATE `ecs_status` SET instance='%s'" % str(id))
+        d.commit()
+    pass
+
+def getId():
+    with database() as d:
+        cur = d.cursor()
+        cur.execute("SELECT instance FROM `ecs_status` WHERE id=1")
+        r = cur.fetchone()
+        if not r:
+            return None
+        return r[0]

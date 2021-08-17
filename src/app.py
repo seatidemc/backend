@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, make_response
 from flask_restful import Api
-from apis.ecs import EcsDescribe, EcsGetstatus, EcsSetstatus
+from apis.ecs import EcsAction, EcsDescribe
 
 app = Flask(__name__)
 api = Api(app)
@@ -36,12 +36,14 @@ NAME = 'ecs'
 VERSION = 'v1'
 PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
-api.add_resource(EcsSetstatus, PREFIX + 'setstatus')
-api.add_resource(EcsGetstatus, PREFIX + 'getstatus')
 api.add_resource(EcsDescribe, PREFIX + 'describe/price', endpoint = 'desc-pric')
-api.add_resource(EcsDescribe, PREFIX + "describe/instance", endpoint = 'desc-inst')
-api.add_resource(EcsDescribe, PREFIX + "describe/available", endpoint = 'desc-avai')
-api.add_resource(EcsDescribe, PREFIX + "describe/status", endpoint = 'desc-stat')
+api.add_resource(EcsDescribe, PREFIX + 'describe/instance', endpoint = 'desc-inst')
+api.add_resource(EcsDescribe, PREFIX + 'describe/available', endpoint = 'desc-avai')
+api.add_resource(EcsDescribe, PREFIX + 'describe/status', endpoint = 'desc-stat')
+api.add_resource(EcsAction, PREFIX + 'action/new', endpoint = 'act-new')
+api.add_resource(EcsAction, PREFIX + 'action/delete', endpoint = 'act-delete')
+api.add_resource(EcsAction, PREFIX + 'action/start', endpoint = 'act-start')
+api.add_resource(EcsAction, PREFIX + 'action/init', endpoint = 'act-init')
 
 if __name__ == '__main__':
     app.run(debug=True)
