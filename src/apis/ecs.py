@@ -55,6 +55,8 @@ class EcsAction(Resource):
         id = r.get('InstanceId')
         if not id:
             return ng('Failed to get InstanceId.')
+        updateId(id)
+        writeHistory(id, 'create')
         return ok(r)
 
 class EcsDescribe(Resource):
