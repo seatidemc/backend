@@ -3,13 +3,13 @@ from aliyunsdkcore.client import AcsClient
 from aliyunsdkecs.request.v20140526 import DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
 from conf import getcfg
 
-client = AcsClient(
-   "LTAI5tA7M2vgpVAaePbsQWKZ", 
-   "iRo9Rmwzqry5VpAdD39WUf9sIDEjWh",
-   "cn-beijing"
-)
-
 ecs = getcfg()['ecs']
+
+client = AcsClient(
+   ecs['access_key'], 
+   ecs['access_secret'],
+   ecs['region']
+)
 
 def describePrice():
     request = DescribePriceRequest.DescribePriceRequest()
