@@ -41,6 +41,8 @@ python -m venv .
 
 ```sh
 pip install ./requirements.txt
+cd src
+unzip ./localdep.zip # Edited Aliyun Python SDK Core & Ecs
 ```
 
 4. Initialize database. Just simply copy all the content in `.sql` and execute them in the MySQL command prompt. Please don't continue if there is any problem.
@@ -54,6 +56,5 @@ vim config.yml
 6. (*Optional*) If you want to test the api in your local environment, just start the development server by running `src/app.py`.
 
 ```sh
-cd src
 python ./app.py
 ```
