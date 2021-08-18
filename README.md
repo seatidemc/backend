@@ -16,7 +16,7 @@ Using a secret AccessKey & AccessSecret set to manage the ECSs. Any action will 
     - `stop` — Stop the instance
 - `/api/ecs/v1/describe/:name`
     - `available` — Check if the instance type is available to be created
-    - `instance` — Get the instance detailed information (type, bandwidth, disksize, zone)
+    - `instance` — Get the detailed information of the preferred instance (type, bandwidth, disksize, zone)
     - `status` — Get the status of the current instance
     - `price` — Get the hourly price of the preferred instance
 
