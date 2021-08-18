@@ -1,0 +1,27 @@
+db:
+  host: 'localhost'
+  username: 'root'
+  password: ~
+ecs:
+  # check in buy page
+  type: ecs.g6.large
+  # vpc/classic
+  network: vpc
+  # PayByTraffic or PayByBandwidth
+  i_chargetype: PayByTraffic
+  # Mbps
+  i_bandwidth: 10
+  # cloud_efficiency/cloud_ssd/cloud_essd
+  disktype: cloud_efficiency
+  # GB
+  disksize: 30
+  # zone must be in the same region as region's set
+  zone: cn-beijing-a
+  region: cn-beijing
+  # SpotAsPriceGo/SpotWithPriceLimit/NoSpot
+  strategy: SpotAsPriceGo
+  image: ubuntu_20_04_x64_20G_alibase_20210521.vhd
+  # password of instance
+  password: ~
+  access_key: ~
+  access_secret: ~
