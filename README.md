@@ -4,7 +4,7 @@ Here is the backend part of SEATiDE RESTful api. The backend simplifies the proc
 
 ## Current implementations
 
-ECS Control with AccessKey & AccessSecret
+### ECS Control with AccessKey & AccessSecret
   
 Using a secret AccessKey & AccessSecret set to manage the ECSs. Any action will be recorded as history in the database. **Note:** Currently there is no authentication system.
 
