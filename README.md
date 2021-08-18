@@ -22,7 +22,7 @@ Using a secret AccessKey & AccessSecret set to manage the ECSs. Any action will 
 
 ## Deployment
 
-**Requires Python 3.8+** This won't work under 3.8 (exclusive).
+**Requires Python 3.8+ and MySQL** This won't work under Python 3.8 (exclusive).
 
 1. Clone the repository
 
