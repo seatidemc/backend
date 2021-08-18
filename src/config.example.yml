@@ -1,27 +1,33 @@
+# Mostly are REQUIRED. The item is marked if optional.
 db:
   host: 'localhost'
   username: 'root'
   password: ~
 ecs:
-  # check in buy page
-  type: ecs.g6.large
-  # vpc/classic
-  network: vpc
-  # PayByTraffic or PayByBandwidth
-  i_chargetype: PayByTraffic
-  # Mbps
-  i_bandwidth: 10
-  # cloud_efficiency/cloud_ssd/cloud_essd
-  disktype: cloud_efficiency
-  # GB
-  disksize: 30
-  # zone must be in the same region as region's set
-  zone: cn-beijing-a
-  region: cn-beijing
-  # SpotAsPriceGo/SpotWithPriceLimit/NoSpot
-  strategy: SpotAsPriceGo
-  image: ubuntu_20_04_x64_20G_alibase_20210521.vhd
-  # password of instance
-  password: ~
+  # Aliyun AcessKey & Secret
+  # PLEASE BE CAREFUL ABOUT THIS!
+  # AFTER YOU FILL IN, YOU SHOULD PREVENT THIS FILE FROM DISCLOSURE.
   access_key: ~
   access_secret: ~
+  # Determine the instance type. You can view them all in a buying page.
+  type: ecs.g6.large
+  # Network Type: vps OR classic
+  network: vpc
+  # Internet Charge Type: PayByTraffic OR PayByBandwidth
+  i_chargetype: PayByTraffic
+  # Internet Bandwidth (Mbps)
+  i_bandwidth: 10
+  # System Disk Type: cloud_efficiency OR cloud_ssd OR cloud_essd
+  disktype: cloud_efficiency
+  # System Disk Size (GB)
+  disksize: 30
+  # Zone and Region (Both will affect the final price)
+  zone: cn-beijing-a
+  region: cn-beijing
+  # Pricing Strategy: SpotAsPriceGo OR SpotWithPriceLimit OR NoSpot
+  strategy: SpotAsPriceGo
+  # Image in Use. You can view them by requesting the DescribeImage api provided by Aliyun.
+  image: ubuntu_20_04_x64_20G_alibase_20210521.vhd
+  # [Optional] Instance Password. Note: if this is set to `~`(null), you'll need to set it in a Aliyun web terminal.
+  password: ~
+  
