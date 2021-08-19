@@ -32,4 +32,5 @@ ecs:
   password: ~
 # Enable deployment on initialization?
 deploy: false
-  
+# Use a secret string (any value) to encode login tokens
+secret: ~
