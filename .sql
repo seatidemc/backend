@@ -28,6 +28,7 @@ CREATE TABLE `data` (
     `last_updated` TIMESTAMP NOT NULL,
     `username` VARCHAR(20) NOT NULL,
     `password` VARCHAR(200) NOT NULL,
+    `email` VARCHAR(50) NOT NULL,
     `group` VARCHAR(10) NOT NULL,
     `nickname` VARCHAR(20) DEFAULT NULL
 );
