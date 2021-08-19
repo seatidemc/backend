@@ -9,6 +9,9 @@ DATABASE_ERROR = 'Database error.'
 REQUEST_ERROR = 'Request error.'
 PARSE_ERROR = 'Parse error.'
 
+DBNAME_ECS = 'ecs'
+DBNAME_USER = 'user'
+
 def ng(text=None):
     return jsonify({
         'status': 'ng',
@@ -20,24 +23,6 @@ def ok(text=None):
         'status': 'ok',
         'data': text
     })
-    
-def writeHistory(id, action):
-    ip = getIP()
-    ip = ip or '0.0.0.0'
-    with database() as d:
-        cur = d.cursor()
-        cur.execute('INSERT INTO history (instance, action, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(id), action, ip))
-        d.commit()
-    pass
-
-def writeCommandHistory(cid, iid):
-    ip = getIP()
-    ip = ip or '0.0.0.0'
-    with database() as d:
-        cur = d.cursor()
-        cur.execute('INSERT INTO cmd_history (command_id, invocation_id, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(cid), str(iid), ip))
-        d.commit()
-    pass
 
 def getIP():
     with urllib.request.urlopen("https://pv.sohu.com/cityjson?ie=utf-8") as r:
@@ -46,33 +31,13 @@ def getIP():
         if ip:
             return ip[0]
     return False
-
-def updateId(id):
-    with database() as d:
-        cur = d.cursor()
-        cur.execute("UPDATE `ecs_status` SET instance='%s'" % str(id))
-        d.commit()
-    pass
-
-def getId():
-    with database() as d:
-        cur = d.cursor()
-        cur.execute("SELECT instance FROM `ecs_status` WHERE id=1")
-        r = cur.fetchone()
-        if not r:
-            return None
-        return r[0]
     
 def getObject(response, str=False):
+    """Convert a string-like to JSON Object (dictionary). If the string-like is already a string, set the second param to `True`."""
     de = JSONDecoder()
     return de.decode(response if str else toString(response))
 
 def toString(a):
+    """Forcefully convert an object to string using `utf-8` encoding."""
     return str(a, encoding='utf-8')
 
-def getLastInvocation():
-    with database() as d:
-        cur = d.cursor()
-        cur.execute("SELECT invocation_id FROM `cmd_history` ORDER BY id DESC")
-        r = cur.fetchall()[0][0]
-        return r

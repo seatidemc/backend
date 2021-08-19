@@ -2,7 +2,8 @@ from flask.json import JSONDecoder
 from aliyunsdkcore.acs_exception.exceptions import ServerException
 from flask_restful import Resource
 from flask import request
-from fn import PARSE_ERROR, REQUEST_ERROR, getId, getLastInvocation, getObject, toString, updateId, ng, ok, updateId, writeHistory
+from fn import PARSE_ERROR, REQUEST_ERROR, getObject, toString, ng, ok
+from models.instance import getIId, setIId, writeActionHistory, getLastInvocation 
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
 from futures import doif
@@ -14,6 +15,7 @@ cfg = getcfg()
 class EcsAction(Resource):
     def get(self):
         ep = request.endpoint
+        self.id = getIId()
         m = {
             'act-new': self.new,
             'act-delete': self.delete,
@@ -23,7 +25,7 @@ class EcsAction(Resource):
         return m[ep]() #type: ignore
     
     def init(self):
-        id = getId()
+        id = self.id
         de = JSONDecoder()
         try:
             try:
@@ -36,41 +38,41 @@ class EcsAction(Resource):
                     t3.start()   
             except:
                 return ng('Failed to open tasks.')
-            writeHistory(id, 'init')
+            writeActionHistory(id, 'init')
             return ok()
         except ServerException as e:
             return ng('init ' + REQUEST_ERROR + " Details: " + str(e))
     
     def start(self):
-        id = getId()
+        id = self.id
         try:
             startInstance(id)
-            writeHistory(id, 'start')
+            writeActionHistory(id, 'start')
         except ServerException as e:
             return ng('start ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def stop(self):
-        id = getId()
+        id = self.id
         try:
             startInstance(id)
-            writeHistory(id, 'stop')
+            writeActionHistory(id, 'stop')
         except ServerException as e:
             return ng('stop ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def delete(self):
-        id = getId()
+        id = self.id
         try:
             deleteInstance(id)
-            writeHistory(id, 'delete')
-            updateId('')
+            writeActionHistory(id, 'delete')
+            setIId('')
         except ServerException as e:
             return ng('delete ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def new(self):
-        id = getId()
+        id = self.id
         if id:
             return ng('There is already an instance recorded in the database.')
         r = createInstance()
@@ -81,8 +83,8 @@ class EcsAction(Resource):
         id = r.get('InstanceId')
         if not id:
             return ng('Failed to get InstanceId.')
-        updateId(id)
-        writeHistory(id, 'create')
+        setIId(id)
+        writeActionHistory(id, 'create')
         return self.init()
 
 class EcsDescribe(Resource):
@@ -100,11 +102,13 @@ class EcsDescribe(Resource):
     def lastInvocation(self):
         i = getLastInvocation()
         r = getObject(describeInvocationResult(i))
+        if not i:
+            return ng('No invocation history found.')
         if not r:
             return ng(REQUEST_ERROR)
         invocation = r.get('Invocation').get('InvocationResults').get('InvocationResult')
         if len(invocation) == 0:
-            return ng('No invocation information found')
+            return ng('No invocation information found.')
         invocation = invocation[0]
         return ok({
             'status': invocation.get('InvocationStatus'),
@@ -143,7 +147,7 @@ class EcsDescribe(Resource):
             return ng(PARSE_ERROR)
         
     def status(self):
-        id = getId()
+        id = getIId()
         if not id:
             return ng('Unable to find instance id in database.')
         r = describeInstanceStatus(id)
