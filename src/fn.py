@@ -1,27 +1,39 @@
-from flask import jsonify
+from flask import jsonify, request
 from flask.json import JSONDecoder
-from db import database
 import re
 import urllib.request
+from itsdangerous import BadSignature, SignatureExpired, TimedJSONWebSignatureSerializer as TS
+from conf import getcfg
+import datetime
 
 NOT_ENOUGH_ARGUMENT = 'Not enough argument.'
 DATABASE_ERROR = 'Database error.'
 REQUEST_ERROR = 'Request error.'
 PARSE_ERROR = 'Parse error.'
+INVALID_TOKEN = 'Invalid token.'
+INVALID_ACTION = 'Invalid action.'
 
 DBNAME_ECS = 'ecs'
 DBNAME_USER = 'user'
 
-def ng(text=None):
+TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+def ng(text=None, details=None):
     return jsonify({
         'status': 'ng',
-        'msg': text
+        'msg': (text + ' Details: ' + details) if details else text
     })
     
-def ok(text=None):
+def er(text=None, details=None):
+    return jsonify({
+        'status': 'error',
+        'msg': (text + ' Details: ' + details) if details else text
+    })
+    
+def ok(text=None, details=None):
     return jsonify({
         'status': 'ok',
-        'data': text
+        'data': (text + ' Details: ' + details) if details else text
     })
 
 def getIP():
@@ -31,7 +43,14 @@ def getIP():
         if ip:
             return ip[0]
     return False
-    
+
+def getFromRequest(request, name: str):
+    """A safe approach to getting a value from `request` object."""
+    try:
+        return request.form[name]
+    except:
+        return None
+
 def getObject(response, str=False):
     """Convert a string-like to JSON Object (dictionary). If the string-like is already a string, set the second param to `True`."""
     de = JSONDecoder()
@@ -41,3 +60,21 @@ def toString(a):
     """Forcefully convert an object to string using `utf-8` encoding."""
     return str(a, encoding='utf-8')
 
+def getToken(username):
+    secret = getcfg()['secret']
+    s = TS(secret_key=secret, expires_in=1)
+    return s.dumps(username).decode('ascii')
+
+def verifyToken(token, username):
+    secret = getcfg()['secret']
+    s = TS(secret_key=secret)
+    try:
+        data = s.loads(token)
+        return username == data
+    except SignatureExpired:
+        return None
+    except BadSignature:
+        return False
+
+def toFormattedTime(dt: datetime.datetime):
+    return dt.strftime(TIME_FORMAT)

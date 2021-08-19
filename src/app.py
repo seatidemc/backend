@@ -2,6 +2,8 @@ from flask import Flask, jsonify, make_response
 from conf import getcfg
 from flask_restful import Api
 from apis.ecs import EcsAction, EcsDescribe
+from apis.auth import Auth
+from apis.user import UserAction
 
 app = Flask(__name__)
 api = Api(app)
@@ -46,6 +48,13 @@ api.add_resource(EcsAction, PREFIX + 'action/new', endpoint = 'act-new')
 api.add_resource(EcsAction, PREFIX + 'action/delete', endpoint = 'act-delete')
 api.add_resource(EcsAction, PREFIX + 'action/start', endpoint = 'act-start')
 api.add_resource(EcsAction, PREFIX + 'action/stop', endpoint = 'act-stop')
+
+NAME = 'user'
+VERSION = 'v1'
+PREFIX = '/api/' + NAME + '/' + VERSION + '/'
+
+api.add_resource(UserAction, PREFIX + 'action')
+api.add_resource(Auth, PREFIX + 'auth')
 
 if __name__ == '__main__':
     app.run(debug=True)

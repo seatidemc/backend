@@ -1,7 +1,8 @@
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkecs.request.v20140526 import DescribeInvocationResultsRequest, StopInstanceRequest, RebootInstanceRequest, RunCommandRequest, DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
 from conf import getcfg
-from fn import getId, writeCommandHistory, getObject
+from fn import getObject
+from models.instance import getIId, writeCommandHistory
 
 ecs = getcfg()['ecs']
 
@@ -117,7 +118,7 @@ def stopInstance(id):
     
 def describeInvocationResult(id):
     request = DescribeInvocationResultsRequest.DescribeInvocationResultsRequest()
-    iid = getId()
+    iid = getIId()
     if not iid:
         return None
     request.set_InvokeId(id)
