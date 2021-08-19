@@ -6,7 +6,7 @@ from fn import PARSE_ERROR, REQUEST_ERROR, getId, updateId, ng, ok, updateId, wr
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice
 from futures import doif
-import threading
+from threading import Thread as T
 
 cfg = getcfg()
 
@@ -25,9 +25,9 @@ class EcsAction(Resource):
         de = JSONDecoder()
         try:
             try:
-                t1 = threading.Thread(target=doif, args=(de, id, 'Stopped', allocateIp))
-                t2 = threading.Thread(target=doif, args=(de, id, 'Stopped', startInstance))
-                t3 = threading.Thread(target=doif, args=(de, id, 'Running', deploy))
+                t1 = T(target=doif, args=(de, id, 'Stopped', allocateIp))
+                t2 = T(target=doif, args=(de, id, 'Stopped', startInstance))
+                t3 = T(target=doif, args=(de, id, 'Running', deploy))
                 t1.start()
                 t2.start()
                 t3.start()
@@ -45,6 +45,15 @@ class EcsAction(Resource):
             writeHistory(id, 'start')
         except ServerException as e:
             return ng('start ' + REQUEST_ERROR + " Details: " + str(e))
+        return ok()
+    
+    def stop(self):
+        id = getId()
+        try:
+            startInstance(id)
+            writeHistory(id, 'stop')
+        except ServerException as e:
+            return ng('stop ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def delete(self):
