@@ -19,6 +19,8 @@ Using a secret AccessKey & AccessSecret set to manage the ECSs. Any action will 
     - `status` — Get the status of the current instance
     - `price` — Get the hourly price of the preferred instance
 
+If `deploy` in `config.yml` is set to `true`, `src/run.sh` will be executed when the system is completely booted. Please make sure there is a `run.sh` in `src` directory before you enable `deploy`. **Note:** You can't use `~` in `run.sh`, which will lead to execution problems.
+
 ## Deployment
 
 **Requires Python 3.8+ and MySQL** This won't work under Python 3.8 (exclusive).
