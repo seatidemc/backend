@@ -101,8 +101,7 @@ def deploy(id):
     request.set_InstanceIds([id])
     request.set_CommandContent(cmd)
     request.set_Type('RunShellScript')
-    r = client.do_action_with_exception(request)
-    return r
+    client.do_action_with_exception(request)
     
 def rebootInstance(id):
     request = RebootInstanceRequest.RebootInstanceRequest()

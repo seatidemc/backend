@@ -44,9 +44,6 @@ api.add_resource(EcsDescribe, PREFIX + 'describe/status', endpoint = 'desc-stat'
 api.add_resource(EcsAction, PREFIX + 'action/new', endpoint = 'act-new')
 api.add_resource(EcsAction, PREFIX + 'action/delete', endpoint = 'act-delete')
 api.add_resource(EcsAction, PREFIX + 'action/start', endpoint = 'act-start')
-api.add_resource(EcsAction, PREFIX + 'action/init', endpoint = 'act-init')
-if getcfg()['deploy']:
-    api.add_resource(EcsAction, PREFIX + 'action/deploy', endpoint = 'act-deploy')
 
 if __name__ == '__main__':
     app.run(debug=True)

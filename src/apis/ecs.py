@@ -5,6 +5,8 @@ from flask import request
 from fn import PARSE_ERROR, REQUEST_ERROR, getId, updateId, ng, ok, updateId, writeHistory
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice
+from futures import doif
+import threading
 
 cfg = getcfg()
 
@@ -14,38 +16,27 @@ class EcsAction(Resource):
         m = {
             'act-new': self.new,
             'act-delete': self.delete,
-            'act-init': self.init,
-            'act-start': self.start,
-            'act-deploy': self.deploy
+            'act-start': self.start
         }
         return m[ep]() #type: ignore
     
     def init(self):
         id = getId()
+        de = JSONDecoder()
         try:
-            allocateIp(id)
-            startInstance(id)
-            if cfg['deploy']:
-                deploy(id)
+            try:
+                t1 = threading.Thread(target=doif, args=(de, id, 'Stopped', allocateIp))
+                t2 = threading.Thread(target=doif, args=(de, id, 'Stopped', startInstance))
+                t3 = threading.Thread(target=doif, args=(de, id, 'Running', deploy))
+                t1.start()
+                t2.start()
+                t3.start()
+            except:
+                return ng('Failed to open tasks.')
             writeHistory(id, 'init')
+            return ok()
         except ServerException as e:
-            return ng(REQUEST_ERROR + " Details: " + str(e))
-        return ok()
-    
-    def deploy(self):
-        id = getId()
-        if not id:
-            return ng('Unable to find instance id in database.')
-        try:
-            r = deploy(id)
-            if r is not False:
-                print(r)
-                writeHistory(id, 'deploy')
-            else:
-                return ng(PARSE_ERROR + 'Unable to open run.sh.')
-        except ServerException as e:
-            return ng(REQUEST_ERROR + " Details: " + str(e))
-        return ok()
+            return ng('init ' + REQUEST_ERROR + " Details: " + str(e))
     
     def start(self):
         id = getId()
@@ -53,7 +44,7 @@ class EcsAction(Resource):
             startInstance(id)
             writeHistory(id, 'start')
         except ServerException as e:
-            return ng(REQUEST_ERROR + " Details: " + str(e))
+            return ng('start ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def delete(self):
@@ -63,7 +54,7 @@ class EcsAction(Resource):
             writeHistory(id, 'delete')
             updateId('')
         except ServerException as e:
-            return ng(REQUEST_ERROR + " Details: " + str(e))
+            return ng('delete ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def new(self):
@@ -72,7 +63,7 @@ class EcsAction(Resource):
             return ng('There is already an instance recorded in the database.')
         r = createInstance()
         if not r:
-            return ng(REQUEST_ERROR)
+            return ng('new ' + REQUEST_ERROR)
         de = JSONDecoder()
         r = de.decode(r)
         id = r.get('InstanceId')
@@ -80,7 +71,7 @@ class EcsAction(Resource):
             return ng('Failed to get InstanceId.')
         updateId(id)
         writeHistory(id, 'create')
-        return ok(r)
+        return self.init()
 
 class EcsDescribe(Resource):
     def get(self):
