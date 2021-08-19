@@ -16,7 +16,8 @@ class EcsAction(Resource):
         m = {
             'act-new': self.new,
             'act-delete': self.delete,
-            'act-start': self.start
+            'act-start': self.start,
+            'act-stop': self.stop
         }
         return m[ep]() #type: ignore
     
