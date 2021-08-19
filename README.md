@@ -8,19 +8,35 @@ Here is the backend part of SEATiDE RESTful api. The backend simplifies the proc
   
 Using a secret AccessKey & AccessSecret set to manage the ECSs. Any action will be recorded as history in the database. **Note:** Currently there is no authentication system.
 
-- `/api/ecs/v1/action/:action`
-    - `delete` — Forcefully delete current instance (*without confirmation*)
-    - `new` — Create a preferred instance, then allocate a public ip for it, finally boot it.
-    - `start` — Start the instance
-    - `stop` — Stop the instance
-- `/api/ecs/v1/describe/:name`
-    - `available` — Check if the instance type is available to be created
-    - `instance` — Get the detailed information of the preferred instance (type, bandwidth, disksize, zone)
-    - `status` — Get the status of the current instance
-    - `price` — Get the hourly price of the preferred instance
-    - `last-invoke` — Get the results of the last invocation (only if `deploy` is set to `true`)
+- *GET* `/api/ecs/v1/action/:action`
+  - `delete` — Forcefully delete current instance (*without confirmation*)
+  - `new` — Create a preferred instance, then allocate a public ip for it, finally boot it.
+  - `start` — Start the instance
+  - `stop` — Stop the instance
+- *GET* `/api/ecs/v1/describe/:name`
+  - `available` — Check if the instance type is available to be created
+  - `instance` — Get the detailed information of the preferred instance (type, bandwidth, disksize, zone)
+  - `status` — Get the status of the current instance
+  - `price` — Get the hourly price of the preferred instance
+  - `last-invoke` — Get the results of the last invocation (only if `deploy` is set to `true`)
 
 If `deploy` in `config.yml` is set to `true`, `src/run.sh` will be executed when the system is completely booted. Please make sure there is a `run.sh` in `src` directory before you enable `deploy`. **Note:** You can't use `~` in `run.sh`, which will lead to execution problems.
+
+### User System
+
+CRUD on users. Using `type` to determine actual action.
+
+- *POST* `/api/user/v1/action`
+  - `create` — Create a new user with 3 required arguments: `username`, `password`, `email`
+  - `get` — Get information of a user. *Incompatible with `password`*
+  - `delete` — Delete a user
+  - `alter` — Update a user's data using a ***k-v*** structure. *Incompatible with `password`*
+  - `changepasswd` — Update a user's password
+- *POST* `/api/user/v1/auth`
+  - `auth` — Get login token with 7-day lifetime using username and password
+  - `check` — Check if a token is valid, expired or invalid
+
+**Note:** You must fill the `secret` in `config.yml` with random string (any value) to make it work.
 
 ## Deployment
 
