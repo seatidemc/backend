@@ -31,7 +31,8 @@ class EcsAction(Resource):
                 t3 = T(target=doif, args=(de, id, 'Running', deploy))
                 t1.start()
                 t2.start()
-                t3.start()
+                if str(cfg['deploy']) == 'True':
+                    t3.start()   
             except:
                 return ng('Failed to open tasks.')
             writeHistory(id, 'init')
