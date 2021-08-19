@@ -1,7 +1,7 @@
-from json.decoder import JSONDecoder
 from aliyunsdkcore.client import AcsClient
-from aliyunsdkecs.request.v20140526 import DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
+from aliyunsdkecs.request.v20140526 import DescribeInvocationResultsRequest, RebootInstanceRequest, RunCommandRequest, DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
 from conf import getcfg
+from json import JSONDecoder
 
 ecs = getcfg()['ecs']
 
@@ -87,5 +87,24 @@ def startInstance(id):
 def deleteInstance(id):
     request = DeleteInstanceRequest.DeleteInstanceRequest()
     request.set_Force(True)
+    request.set_InstanceId(id)
+    client.do_action_with_exception(request)
+    
+def deploy(id):
+    request = RunCommandRequest.RunCommandRequest()
+    try:
+        f = open('run.sh')
+        cmd = f.read()
+        f.close()
+    except:
+        return False
+    request.set_InstanceIds([id])
+    request.set_CommandContent(cmd)
+    request.set_Type('RunShellScript')
+    r = client.do_action_with_exception(request)
+    return r
+    
+def rebootInstance(id):
+    request = RebootInstanceRequest.RebootInstanceRequest()
     request.set_InstanceId(id)
     client.do_action_with_exception(request)

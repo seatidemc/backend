@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, make_response
+from conf import getcfg
 from flask_restful import Api
 from apis.ecs import EcsAction, EcsDescribe
 
@@ -44,6 +45,8 @@ api.add_resource(EcsAction, PREFIX + 'action/new', endpoint = 'act-new')
 api.add_resource(EcsAction, PREFIX + 'action/delete', endpoint = 'act-delete')
 api.add_resource(EcsAction, PREFIX + 'action/start', endpoint = 'act-start')
 api.add_resource(EcsAction, PREFIX + 'action/init', endpoint = 'act-init')
+if getcfg()['deploy']:
+    api.add_resource(EcsAction, PREFIX + 'action/deploy', endpoint = 'act-deploy')
 
 if __name__ == '__main__':
     app.run(debug=True)

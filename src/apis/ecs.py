@@ -4,7 +4,9 @@ from flask_restful import Resource
 from flask import request
 from fn import PARSE_ERROR, REQUEST_ERROR, getId, updateId, ng, ok, updateId, writeHistory
 from conf import getcfg
-from sdk import allocateIp, deleteInstance, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice
+from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice
+
+cfg = getcfg()
 
 class EcsAction(Resource):
     def get(self):
@@ -13,7 +15,8 @@ class EcsAction(Resource):
             'act-new': self.new,
             'act-delete': self.delete,
             'act-init': self.init,
-            'act-start': self.start
+            'act-start': self.start,
+            'act-deploy': self.deploy
         }
         return m[ep]() #type: ignore
     
@@ -22,7 +25,24 @@ class EcsAction(Resource):
         try:
             allocateIp(id)
             startInstance(id)
+            if cfg['deploy']:
+                deploy(id)
             writeHistory(id, 'init')
+        except ServerException as e:
+            return ng(REQUEST_ERROR + " Details: " + str(e))
+        return ok()
+    
+    def deploy(self):
+        id = getId()
+        if not id:
+            return ng('Unable to find instance id in database.')
+        try:
+            r = deploy(id)
+            if r is not False:
+                print(r)
+                writeHistory(id, 'deploy')
+            else:
+                return ng(PARSE_ERROR + 'Unable to open run.sh.')
         except ServerException as e:
             return ng(REQUEST_ERROR + " Details: " + str(e))
         return ok()
@@ -47,6 +67,9 @@ class EcsAction(Resource):
         return ok()
     
     def new(self):
+        id = getId()
+        if id:
+            return ng('There is already an instance recorded in the database.')
         r = createInstance()
         if not r:
             return ng(REQUEST_ERROR)
@@ -80,7 +103,7 @@ class EcsDescribe(Resource):
         return ok(price)
     
     def instance(self):
-        ecs = getcfg()['ecs']
+        ecs = cfg['ecs']
         return ok({
             'type': ecs['type'],
             'bandwidth': ecs['i_bandwidth'],
@@ -118,7 +141,7 @@ class EcsDescribe(Resource):
                 id = st[0].get('InstanceId')
                 return ok({
                     'status': status,
-                    id: id,
+                    'id': id,
                     'created': True
                 })
             else:

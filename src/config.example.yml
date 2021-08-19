@@ -30,4 +30,6 @@ ecs:
   image: ubuntu_20_04_x64_20G_alibase_20210521.vhd
   # [Optional] Instance Password. Note: if this is set to `~`(null), you'll need to set it in a Aliyun web terminal.
   password: ~
+# Enable deployment on initialization?
+deploy: false
   

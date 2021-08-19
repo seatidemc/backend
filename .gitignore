@@ -5,3 +5,4 @@ Lib
 Include
 config.yml
 aliyunsdk*
+run.sh
