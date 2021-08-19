@@ -1,6 +1,6 @@
-CREATE DATABASE ecs_central;
-USE ecs_central;
-CREATE TABLE ecs_status (
+CREATE DATABASE ecs;
+USE ecs;
+CREATE TABLE `status` (
     `id` INT UNSIGNED NOT NULL DEFAULT 1,
     `instance` VARCHAR(50),
     `last_updated` TIMESTAMP NOT NULL
@@ -19,4 +19,15 @@ CREATE TABLE cmd_history (
     `command_id` VARCHAR(50) NOT NULL,
     `invocation_id` VARCHAR(50) NOT NULL
 );
-INSERT INTO ecs_status () VALUES ();
+INSERT INTO `status` () VALUES ();
+CREATE DATABASE user;
+USE user;
+CREATE TABLE `data` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `created_at` DATETIME NOT NULL,
+    `last_updated` TIMESTAMP NOT NULL,
+    `username` VARCHAR(20) NOT NULL,
+    `password` VARCHAR(200) NOT NULL,
+    `group` VARCHAR(10) NOT NULL,
+    `nickname` VARCHAR(20) DEFAULT NULL
+);
