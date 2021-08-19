@@ -2,11 +2,12 @@ from flask.json import JSONDecoder
 from aliyunsdkcore.acs_exception.exceptions import ServerException
 from flask_restful import Resource
 from flask import request
-from fn import PARSE_ERROR, REQUEST_ERROR, getId, updateId, ng, ok, updateId, writeHistory
+from fn import PARSE_ERROR, REQUEST_ERROR, getId, getLastInvocation, getObject, toString, updateId, ng, ok, updateId, writeHistory
 from conf import getcfg
-from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice
+from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
 from futures import doif
 from threading import Thread as T
+from base64 import b64decode
 
 cfg = getcfg()
 
@@ -91,16 +92,31 @@ class EcsDescribe(Resource):
             'desc-pric': self.price,
             'desc-inst': self.instance,
             'desc-avai': self.available,
-            'desc-stat': self.status
+            'desc-stat': self.status,
+            'desc-lastinv': self.lastInvocation
         }
         return m[ep]() #type: ignore
-                
+    
+    def lastInvocation(self):
+        i = getLastInvocation()
+        r = getObject(describeInvocationResult(i))
+        if not r:
+            return ng(REQUEST_ERROR)
+        invocation = r.get('Invocation').get('InvocationResults').get('InvocationResult')
+        if len(invocation) == 0:
+            return ng('No invocation information found')
+        invocation = invocation[0]
+        return ok({
+            'status': invocation.get('InvocationStatus'),
+            'output': toString(b64decode(invocation.get('Output'))),
+            'error': invocation.get('ErrorInfo')
+        })
+     
     def price(self):
         r = describePrice()
         if not r:
             return ng(REQUEST_ERROR)
-        de = JSONDecoder()
-        r = de.decode(r)
+        r = getObject(r)
         price = r.get('PriceInfo').get('Price').get('TradePrice')
         return ok(price)
     
@@ -117,8 +133,7 @@ class EcsDescribe(Resource):
         r = describeAvailable()
         if not r:
             return ng(REQUEST_ERROR)
-        de = JSONDecoder()
-        r = de.decode(r)
+        r = getObject(r)
         try:
             if len(r.get('AvailableZones').get('AvailableZone')) > 0:
                 return ok(True)
@@ -134,8 +149,7 @@ class EcsDescribe(Resource):
         r = describeInstanceStatus(id)
         if not r:
             return ng(REQUEST_ERROR)
-        de = JSONDecoder()
-        r = de.decode(r)
+        r = getObject(r, True)
         try:
             st = r.get('InstanceStatuses').get('InstanceStatus')
             if len(st) > 0:

@@ -1,4 +1,5 @@
 from flask import jsonify
+from flask.json import JSONDecoder
 from db import database
 import re
 import urllib.request
@@ -29,6 +30,15 @@ def writeHistory(id, action):
         d.commit()
     pass
 
+def writeCommandHistory(cid, iid):
+    ip = getIP()
+    ip = ip or '0.0.0.0'
+    with database() as d:
+        cur = d.cursor()
+        cur.execute('INSERT INTO cmd_history (command_id, invocation_id, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(cid), str(iid), ip))
+        d.commit()
+    pass
+
 def getIP():
     with urllib.request.urlopen("https://pv.sohu.com/cityjson?ie=utf-8") as r:
         result = r.read().decode("utf8")
@@ -52,3 +62,17 @@ def getId():
         if not r:
             return None
         return r[0]
+    
+def getObject(response, str=False):
+    de = JSONDecoder()
+    return de.decode(response if str else toString(response))
+
+def toString(a):
+    return str(a, encoding='utf-8')
+
+def getLastInvocation():
+    with database() as d:
+        cur = d.cursor()
+        cur.execute("SELECT invocation_id FROM `cmd_history` ORDER BY id DESC")
+        r = cur.fetchall()[0][0]
+        return r

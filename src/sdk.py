@@ -1,6 +1,7 @@
 from aliyunsdkcore.client import AcsClient
-from aliyunsdkecs.request.v20140526 import StopInstanceRequest, RebootInstanceRequest, RunCommandRequest, DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
+from aliyunsdkecs.request.v20140526 import DescribeInvocationResultsRequest, StopInstanceRequest, RebootInstanceRequest, RunCommandRequest, DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
 from conf import getcfg
+from fn import getId, writeCommandHistory, getObject
 
 ecs = getcfg()['ecs']
 
@@ -100,7 +101,9 @@ def deploy(id):
     request.set_InstanceIds([id])
     request.set_CommandContent(cmd)
     request.set_Type('RunShellScript')
-    client.do_action_with_exception(request)
+    request.set_Timeout(99999)
+    r = getObject(client.do_action_with_exception(request))
+    writeCommandHistory(r.get('CommandId'), r.get('InvokeId'))
     
 def rebootInstance(id):
     request = RebootInstanceRequest.RebootInstanceRequest()
@@ -111,3 +114,12 @@ def stopInstance(id):
     request = StopInstanceRequest.StopInstanceRequest()
     request.set_InstanceId(id)
     client.do_action_with_exception(request)
+    
+def describeInvocationResult(id):
+    request = DescribeInvocationResultsRequest.DescribeInvocationResultsRequest()
+    iid = getId()
+    if not iid:
+        return None
+    request.set_InvokeId(id)
+    request.set_InstanceId(iid)
+    return client.do_action_with_exception(request)
