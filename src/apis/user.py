@@ -15,10 +15,9 @@ class UserAction(Resource):
             'alter': self.alter,
             'changepasswd': self.changePassword
         }
-        fn = match[type]
-        if not fn:
+        if not type in match.keys():
             return er(INVALID_ACTION)
-        return fn() #type:ignore
+        return match[type]() #type:ignore
       
     def create(self):
         username = getFromRequest(request, 'username')

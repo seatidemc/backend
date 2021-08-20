@@ -1,28 +1,36 @@
 from flask.json import JSONDecoder
 from aliyunsdkcore.acs_exception.exceptions import ServerException
-from flask_restful import Resource
+from flask_restful import Resource, abort
 from flask import request
-from fn import PARSE_ERROR, REQUEST_ERROR, getObject, toString, ng, ok
+from fn import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PARSE_ERROR, REQUEST_ERROR, getFromRequest, getObject, toString, ng, ok, er
 from models.instance import getIId, setIId, writeActionHistory, getLastInvocation 
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
 from futures import doif
 from threading import Thread as T
 from base64 import b64decode
+from apis.auth import isAdminToken
 
 cfg = getcfg()
 
 class EcsAction(Resource):
-    def get(self):
-        ep = request.endpoint
+    def post(self):
+        type = getFromRequest(request, 'type')
+        token = getFromRequest(request, 'token')
+        if not type or not token:
+            return ng(NOT_ENOUGH_ARGUMENT, 'type, token')
+        if not isAdminToken(token):
+            abort(401)
         self.id = getIId()
-        m = {
-            'act-new': self.new,
-            'act-delete': self.delete,
-            'act-start': self.start,
-            'act-stop': self.stop
+        match = {
+            'new': self.new,
+            'delete': self.delete,
+            'start': self.start,
+            'stop': self.stop
         }
-        return m[ep]() #type: ignore
+        if not type in match.keys():
+            return er(INVALID_ACTION)
+        return match[type]() #type:ignore
     
     def init(self):
         id = self.id

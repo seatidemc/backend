@@ -13,7 +13,8 @@ def notFoundError(err):
     return make_response(
         jsonify({
             'error': 'NOT_FOUND',
-            'code': 404
+            'code': 404,
+            'status': 'http-error'
         })
     )
 
@@ -22,7 +23,8 @@ def internalServerError(err):
     return make_response(
         jsonify({
             'error': 'INTERNAL_SERVER_ERROR',
-            'code': 500
+            'code': 500,
+            'status': 'http-error'
         })
     )
 
@@ -31,7 +33,8 @@ def unauthorizedError(err):
     return make_response(
         jsonify({
             'error': 'UNAUTHORIZED',
-            'code': 401
+            'code': 401,
+            'status': 'http-error'
         })
     )
     
@@ -44,10 +47,7 @@ api.add_resource(EcsDescribe, PREFIX + 'describe/instance', endpoint = 'desc-ins
 api.add_resource(EcsDescribe, PREFIX + 'describe/available', endpoint = 'desc-avai')
 api.add_resource(EcsDescribe, PREFIX + 'describe/status', endpoint = 'desc-stat')
 api.add_resource(EcsDescribe, PREFIX + 'describe/last-invoke', endpoint = 'desc-lastinv')
-api.add_resource(EcsAction, PREFIX + 'action/new', endpoint = 'act-new')
-api.add_resource(EcsAction, PREFIX + 'action/delete', endpoint = 'act-delete')
-api.add_resource(EcsAction, PREFIX + 'action/start', endpoint = 'act-start')
-api.add_resource(EcsAction, PREFIX + 'action/stop', endpoint = 'act-stop')
+api.add_resource(EcsAction, PREFIX + 'action')
 
 NAME = 'user'
 VERSION = 'v1'
