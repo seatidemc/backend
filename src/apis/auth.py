@@ -22,6 +22,9 @@ class Auth(Resource):
     
     def check(self):
         token = getFromRequest(request, 'token')
+        if not token:
+            return er(NOT_ENOUGH_ARGUMENT)
+        assert self.username
         c = verifyToken(token, self.username)
         if c is True:
             return ok()
