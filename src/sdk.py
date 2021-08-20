@@ -91,7 +91,7 @@ def deleteInstance(id):
     request.set_InstanceId(id)
     client.do_action_with_exception(request)
     
-def deploy(id):
+def deploy(id, token):
     request = RunCommandRequest.RunCommandRequest()
     try:
         f = open('run.sh')
@@ -104,7 +104,7 @@ def deploy(id):
     request.set_Type('RunShellScript')
     request.set_Timeout(99999)
     r = getObject(client.do_action_with_exception(request))
-    writeCommandHistory(r.get('CommandId'), r.get('InvokeId'))
+    writeCommandHistory(token, r.get('CommandId'), r.get('InvokeId'))
     
 def rebootInstance(id):
     request = RebootInstanceRequest.RebootInstanceRequest()

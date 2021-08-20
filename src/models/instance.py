@@ -1,4 +1,5 @@
-from fn import DBNAME_ECS, getIP
+from fn.auth import getDataFromToken
+from fn.keywords import DBNAME_ECS
 from db import database
 
 def getIId():
@@ -23,21 +24,19 @@ def getLastInvocation():
                     return r[0][0]
         return None
 
-def writeActionHistory(id, action):
-    ip = getIP()
-    ip = ip or '0.0.0.0'
+def writeActionHistory(token, action):
+    username = getDataFromToken(token, 'username')
     with database(DBNAME_ECS) as d:
         cur = d.cursor()
-        cur.execute('INSERT INTO history (instance, action, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(id), action, ip))
+        cur.execute('INSERT INTO history (instance, action, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(id), action, username))
         d.commit()
     pass
 
-def writeCommandHistory(cid, iid):
-    ip = getIP()
-    ip = ip or '0.0.0.0'
+def writeCommandHistory(token, cid, iid):
+    username = getDataFromToken(token, 'username')
     with database(DBNAME_ECS) as d:
         cur = d.cursor()
-        cur.execute('INSERT INTO cmd_history (command_id, invocation_id, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(cid), str(iid), ip))
+        cur.execute('INSERT INTO cmd_history (command_id, invocation_id, created_at, created_by) VALUES ("%s", "%s", NOW(), "%s")' % (str(cid), str(iid), username))
         d.commit()
     pass
 

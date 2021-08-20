@@ -1,7 +1,7 @@
 from sdk import describeInstanceStatus
 import time
 
-def doif(de, id, type, cb, withIdArg=True, timeToWait=3):
+def doif(de, type, cb, id=None, token=None):
     while True:
         r = describeInstanceStatus(id)
         if not r:
@@ -14,12 +14,16 @@ def doif(de, id, type, cb, withIdArg=True, timeToWait=3):
                 print(status)
                 if status == type:
                     print('do running: ' + type)
-                    if withIdArg is True:
+                    if id and token:
+                        cb(id, token)
+                    elif id:
                         cb(id)
+                    elif token:
+                        cb(token)
                     else:
                         cb()
                     break
-                time.sleep(timeToWait)
+                time.sleep(3)
             else:
                 raise Exception()
         except:

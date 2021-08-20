@@ -1,9 +1,10 @@
 from flask_restful import Resource
 from flask import request
-from fn import INVALID_TOKEN, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, DATABASE_ERROR, getFromRequest, ok, er, ng
+from fn.keywords import INVALID_TOKEN, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, DATABASE_ERROR
+from fn.common import getFromRequest
+from fn.req import ok, er, ng
+from fn.auth import verifyToken, getToken
 from models.user import User
-from itsdangerous import BadSignature, SignatureExpired, TimedJSONWebSignatureSerializer as TS
-from conf import getcfg
 
 class Auth(Resource):
     def post(self):
@@ -45,32 +46,4 @@ class Auth(Resource):
                 return ng('Not verified.')
         except Exception as e:
             return er(DATABASE_ERROR, str(e))
-        
-def getToken(username, group):
-    secret = getcfg()['secret']
-    s = TS(secret_key=secret, expires_in=604800) # 7 days
-    return s.dumps({'username': username, 'group': group}).decode('ascii')
-
-def verifyToken(token, username):
-    """Verify if a token is valid, expired or invalid. Returns `group`."""
-    secret = getcfg()['secret']
-    s = TS(secret_key=secret)
-    try:
-        data = s.loads(token)
-        if username:
-            if username == data['username']:
-                return data['group']
-        elif username is None:
-            return data['group']
-        return False
-    except SignatureExpired:
-        return None
-    except BadSignature:
-        return False
     
-def isAdminToken(token):
-    """Verify if a token has administrator's power."""
-    group = verifyToken(token, None)
-    if not group:
-        return False
-    return group == 'admin'

@@ -1,27 +1,26 @@
 from flask.json import JSONDecoder
 from aliyunsdkcore.acs_exception.exceptions import ServerException
-from flask_restful import Resource, abort
+from flask_restful import Resource
 from flask import request
 from fn.keywords import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PARSE_ERROR, PERMISSION_DENIED, REQUEST_ERROR
 from fn.common import getFromRequest, getObject, toString
 from fn.req import ng, ok, er
+from fn.auth import checkDataFromToken
 from models.instance import getIId, setIId, writeActionHistory, getLastInvocation 
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
 from futures import doif
 from threading import Thread as T
 from base64 import b64decode
-from apis.auth import isAdminToken
-
 cfg = getcfg()
 
 class EcsAction(Resource):
     def post(self):
         type = getFromRequest(request, 'type')
-        token = getFromRequest(request, 'token')
-        if not type or not token:
+        self.token = getFromRequest(request, 'token')
+        if not type or not self.token:
             return ng(NOT_ENOUGH_ARGUMENT, 'type, token')
-        if not isAdminToken(token):
+        if not checkDataFromToken(self.token, 'group', 'admin'):
             return ng(PERMISSION_DENIED, 'Administrator\'s token is required.')
         self.id = getIId()
         match = {
@@ -39,16 +38,16 @@ class EcsAction(Resource):
         de = JSONDecoder()
         try:
             try:
-                t1 = T(target=doif, args=(de, id, 'Stopped', allocateIp))
-                t2 = T(target=doif, args=(de, id, 'Stopped', startInstance))
-                t3 = T(target=doif, args=(de, id, 'Running', deploy))
+                t1 = T(target=doif, args=(de, 'Stopped', allocateIp, id))
+                t2 = T(target=doif, args=(de, 'Stopped', startInstance, id))
+                t3 = T(target=doif, args=(de, 'Running', deploy, id, self.token))
                 t1.start()
                 t2.start()
                 if str(cfg['deploy']) == 'True':
                     t3.start()   
             except:
                 return ng('Failed to open tasks.')
-            writeActionHistory(id, 'init')
+            writeActionHistory(self.token, 'init')
             return ok()
         except ServerException as e:
             return ng('init ' + REQUEST_ERROR + " Details: " + str(e))
@@ -57,7 +56,7 @@ class EcsAction(Resource):
         id = self.id
         try:
             startInstance(id)
-            writeActionHistory(id, 'start')
+            writeActionHistory(self.token, 'start')
         except ServerException as e:
             return ng('start ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
@@ -66,7 +65,7 @@ class EcsAction(Resource):
         id = self.id
         try:
             startInstance(id)
-            writeActionHistory(id, 'stop')
+            writeActionHistory(self.token, 'stop')
         except ServerException as e:
             return ng('stop ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
@@ -75,7 +74,7 @@ class EcsAction(Resource):
         id = self.id
         try:
             deleteInstance(id)
-            writeActionHistory(id, 'delete')
+            writeActionHistory(self.token, 'delete')
             setIId('')
         except ServerException as e:
             return ng('delete ' + REQUEST_ERROR + " Details: " + str(e))
@@ -94,7 +93,7 @@ class EcsAction(Resource):
         if not id:
             return ng('Failed to get InstanceId.')
         setIId(id)
-        writeActionHistory(id, 'create')
+        writeActionHistory(self.token, 'create')
         return self.init()
 
 class EcsDescribe(Resource):

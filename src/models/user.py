@@ -1,6 +1,7 @@
 from db import database
 from werkzeug.security import generate_password_hash, check_password_hash
-from fn import DBNAME_USER, toFormattedTime
+from fn.keywords import DBNAME_USER
+from fn.common import toFormattedTime
 from pymysql.cursors import DictCursor
 
 class User:
