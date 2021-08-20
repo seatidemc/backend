@@ -1,7 +1,9 @@
 from flask_restful import Resource
 from flask import request
-from fn import INVALID_TOKEN, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, DATABASE_ERROR, getFromRequest, verifyToken, getToken, ok, er, ng
+from fn import INVALID_TOKEN, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, DATABASE_ERROR, getFromRequest, ok, er, ng
 from models.user import User
+from itsdangerous import BadSignature, SignatureExpired, TimedJSONWebSignatureSerializer as TS
+from conf import getcfg
 
 class Auth(Resource):
     def post(self):
@@ -44,3 +46,18 @@ class Auth(Resource):
         except Exception as e:
             return er(DATABASE_ERROR, str(e))
         
+def getToken(username):
+    secret = getcfg()['secret']
+    s = TS(secret_key=secret, expires_in=1)
+    return s.dumps(username).decode('ascii')
+
+def verifyToken(token, username):
+    secret = getcfg()['secret']
+    s = TS(secret_key=secret)
+    try:
+        data = s.loads(token)
+        return username == data
+    except SignatureExpired:
+        return None
+    except BadSignature:
+        return False

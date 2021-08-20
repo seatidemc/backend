@@ -1,9 +1,7 @@
-from flask import jsonify, request
+from flask import jsonify
 from flask.json import JSONDecoder
 import re
 import urllib.request
-from itsdangerous import BadSignature, SignatureExpired, TimedJSONWebSignatureSerializer as TS
-from conf import getcfg
 import datetime
 
 NOT_ENOUGH_ARGUMENT = 'Not enough argument.'
@@ -59,22 +57,6 @@ def getObject(response, str=False):
 def toString(a):
     """Forcefully convert an object to string using `utf-8` encoding."""
     return str(a, encoding='utf-8')
-
-def getToken(username):
-    secret = getcfg()['secret']
-    s = TS(secret_key=secret, expires_in=1)
-    return s.dumps(username).decode('ascii')
-
-def verifyToken(token, username):
-    secret = getcfg()['secret']
-    s = TS(secret_key=secret)
-    try:
-        data = s.loads(token)
-        return username == data
-    except SignatureExpired:
-        return None
-    except BadSignature:
-        return False
 
 def toFormattedTime(dt: datetime.datetime):
     return dt.strftime(TIME_FORMAT)
