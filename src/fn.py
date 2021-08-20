@@ -10,6 +10,7 @@ REQUEST_ERROR = 'Request error.'
 PARSE_ERROR = 'Parse error.'
 INVALID_TOKEN = 'Invalid token.'
 INVALID_ACTION = 'Invalid action.'
+PERMISSION_DENIED = 'Permission denied.'
 
 DBNAME_ECS = 'ecs'
 DBNAME_USER = 'user'
