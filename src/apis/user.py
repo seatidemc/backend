@@ -1,7 +1,9 @@
 from models.user import User
 from flask_restful import Resource
 from flask import request
-from fn import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, er, getFromRequest, getObject, ng, ok
+from fn.keywords import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT
+from fn.req import er, ng, ok
+from fn.common import getFromRequest, getObject
 
 class UserAction(Resource):
     def post(self):

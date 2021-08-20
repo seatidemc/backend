@@ -2,7 +2,9 @@ from flask.json import JSONDecoder
 from aliyunsdkcore.acs_exception.exceptions import ServerException
 from flask_restful import Resource, abort
 from flask import request
-from fn import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PARSE_ERROR, PERMISSION_DENIED, REQUEST_ERROR, getFromRequest, getObject, toString, ng, ok, er
+from fn.keywords import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PARSE_ERROR, PERMISSION_DENIED, REQUEST_ERROR
+from fn.common import getFromRequest, getObject, toString
+from fn.req import ng, ok, er
 from models.instance import getIId, setIId, writeActionHistory, getLastInvocation 
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
