@@ -8,7 +8,7 @@ Here is the backend part of SEATiDE RESTful api. The backend simplifies the proc
   
 Using a secret AccessKey & AccessSecret set to manage the ECSs. Any action will be recorded as history in the database. **Note:** Currently there is no authentication system. Using `type` in post requests to determine actual action.
 
-- *POST* `/api/ecs/v1/action/:action`
+- *POST* `/api/ecs/v1/action`
   - `delete` — Forcefully delete current instance (*without confirmation*)
   - `new` — Create a preferred instance, then allocate a public ip for it, finally boot it.
   - `start` — Start the instance
