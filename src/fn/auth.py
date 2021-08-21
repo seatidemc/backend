@@ -41,4 +41,4 @@ def checkDataFromToken(token: str, key: str, value: Any) -> bool:
     data = getDataFromToken(token, key)
     if not data:
         return False
-    return data[key] == value
+    return data == value

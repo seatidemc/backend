@@ -11,7 +11,7 @@ class Auth(Resource):
         self.username = getFromRequest(request, 'username')
         type = getFromRequest(request, 'type')
         if not type or not self.username:
-            return er(NOT_ENOUGH_ARGUMENT)
+            return er(NOT_ENOUGH_ARGUMENT, 'username, type')
         match = {
             'check': self.check,
             'auth': self.auth
@@ -34,17 +34,16 @@ class Auth(Resource):
             return er(INVALID_TOKEN)
         
     def auth(self):
-        username = getFromRequest(request, 'username')
         password = getFromRequest(request, 'password')
-        if not username or not password:
+        if not self.username or not password:
             return er(NOT_ENOUGH_ARGUMENT)
-        user = User(username, password)
+        user = User(self.username, password)
         try:
             if not user.exists():
                 return ng('User not exists.')
             if user.checkPassword():
                 group = user.get()['group']
-                return ok(getToken(username, group))
+                return ok(getToken(self.username, group))
             else:
                 return ng('Not verified.')
         except Exception as e:

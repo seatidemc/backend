@@ -129,7 +129,7 @@ class EcsDescribe(Resource):
         r = describePrice()
         if not r:
             return ng(REQUEST_ERROR)
-        r = getObject(r)
+        r = getObject(r, True)
         price = r.get('PriceInfo').get('Price').get('TradePrice')
         return ok(price)
     
