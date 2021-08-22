@@ -35,7 +35,8 @@ def describePrice():
 def describeAvailable():
     request = DescribeAvailableResourceRequest.DescribeAvailableResourceRequest()
     request.set_InstanceType(ecs['type'])
-    request.set_SystemDiskCategory(ecs['disktype'])
+    request.set_SystemDiskCategory(ecs['systemdisk']['type'])
+    request.set_DataDiskCategory(ecs['datadisk']['type'])
     request.set_ZoneId(ecs['zone'])
     request.set_SpotStrategy(ecs['strategy'])
     request.set_DestinationResource('InstanceType')
@@ -62,8 +63,13 @@ def createInstance():
     request.set_InstanceType(ecs['type'])
     request.set_InternetChargeType(ecs['i_chargetype'])
     request.set_InternetMaxBandwidthOut(ecs['i_bandwidth'])
-    request.set_SystemDiskCategory(ecs['disktype'])
-    request.set_SystemDiskSize(ecs['disksize'])
+    request.set_SystemDiskCategory(ecs['systemdisk']['type'])
+    request.set_SystemDiskSize(ecs['systemdisk']['size'])
+    request.set_DataDisks([{
+        "Size": ecs['datadisk']['size'],
+        "Category": ecs['datadisk']['type'],
+        "DeleteWithInstance": True
+    }])
     request.set_ZoneId(ecs['zone'])
     request.set_SpotStrategy(ecs['strategy'])
     request.set_ImageId(ecs['image'])
