@@ -6,34 +6,33 @@ from fn.common import getObject
 
 class Monitor():
     def __init__(self):
-        self.work = T(target=self.monitor)
+        self.monitors: list[T] = []
+        self.monitors.append(T(target=self.unexpectedDeletionMonitor))
         pass
     
-    def monitor(self):
+    def unexpectedDeletionMonitor(self):
         while True:
-            print("[MONITOR] Monitoring instance status...")
             id = getIId()
             sleep(5)
             if not id:
                 continue
-            print("[MONITOR][DETECTED] Detected instance id in database " + id)
             r = describeInstanceStatus(id)
             try:
                 r = getObject(r, True)
                 st = r.get('InstanceStatuses').get('InstanceStatus')
                 if len(st) == 0:
-                    print("[MONITOR][DETECTED] Unexpected deletion.")
+                    print("[MONITOR] Detected nexpected deletion.")
                     writeActionHistory(None, id, 'udelete', '_monitor')
                     setIId('')
                 else:
-                    status = st[0].get('Status')
-                    print("[MONITOR] Normal: " + status)
+                    # status = st[0].get('Status')
                     continue
             except Exception as e:
                 print("[MONITOR][ERROR] Error in monitor:")
                 print(str(e))
     
     def start(self):
-        self.work.daemon = True
-        self.work.start()
+        for m in self.monitors:
+            m.daemon = True
+            m.start()
         pass
