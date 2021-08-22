@@ -1,5 +1,7 @@
 # backend
 
+[简体中文](./README.md) | English
+
 Here is the backend part of SEATiDE RESTful api. The backend simplifies the process of creating, starting and deleting Aliyun ECS instance for game playing, and also provides a platform for users to communicate with the database, which could be used to save Minecraft user data, user identity, levels & ranks, and so on in the not-too-distant future.
 
 ## Current implementations
