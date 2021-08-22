@@ -110,11 +110,10 @@ class EcsDescribe(Resource):
     
     def lastInvocation(self):
         i = getLastInvocation()
-        r = getObject(describeInvocationResult(i))
-        if not i:
+        r = describeInvocationResult(i)
+        if not r or not i:
             return ng('No invocation history found.')
-        if not r:
-            return ng(REQUEST_ERROR)
+        r = getObject(r, True)
         invocation = r.get('Invocation').get('InvocationResults').get('InvocationResult')
         if len(invocation) == 0:
             return ng('No invocation information found.')
