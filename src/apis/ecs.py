@@ -153,7 +153,7 @@ class EcsDescribe(Resource):
         r = describeAvailable()
         if not r:
             return ng(REQUEST_ERROR)
-        r = getObject(r)
+        r = getObject(r, True)
         try:
             if len(r.get('AvailableZones').get('AvailableZone')) > 0:
                 return ok(True)
