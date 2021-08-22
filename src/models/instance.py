@@ -44,6 +44,6 @@ def setIId(id):
     """Update current instance id."""
     with database(DBNAME_ECS) as d:
         cur = d.cursor()
-        cur.execute("UPDATE `status` SET instance='%s'" % str(id))
+        cur.execute("UPDATE `status` SET instance='%s' WHERE id=1" % str(id))
         d.commit()
     pass
