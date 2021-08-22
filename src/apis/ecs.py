@@ -33,8 +33,7 @@ class EcsAction(Resource):
             return er(INVALID_ACTION)
         return match[type]() #type:ignore
     
-    def init(self):
-        id = self.id
+    def init(self, id):
         de = JSONDecoder()
         try:
             try:
@@ -94,7 +93,7 @@ class EcsAction(Resource):
             return ng('Failed to get InstanceId.')
         setIId(id)
         writeActionHistory(self.token, 'create')
-        return self.init()
+        return self.init(id)
 
 class EcsDescribe(Resource):
     def get(self):
@@ -113,7 +112,7 @@ class EcsDescribe(Resource):
         r = describeInvocationResult(i)
         if not r or not i:
             return ng('No invocation history found.')
-        r = getObject(r, True)
+        r = getObject(r)
         invocation = r.get('Invocation').get('InvocationResults').get('InvocationResult')
         if len(invocation) == 0:
             return ng('No invocation information found.')
