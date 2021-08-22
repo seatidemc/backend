@@ -4,9 +4,12 @@ from flask_restful import Api
 from apis.ecs import EcsAction, EcsDescribe
 from apis.auth import Auth
 from apis.user import UserAction
+from monitor import Monitor
 
 app = Flask(__name__)
 api = Api(app)
+monitor = Monitor()
+monitor.start()
 
 @app.errorhandler(404)
 def notFoundError(err):
@@ -61,4 +64,4 @@ if __name__ == '__main__':
         from waitress import serve
         serve(app, host='0.0.0.0', port='8080') 
     else:
-        app.run(debug=True)
+        app.run(debug=False)

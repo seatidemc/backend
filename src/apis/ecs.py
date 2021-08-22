@@ -2,7 +2,7 @@ from flask.json import JSONDecoder
 from aliyunsdkcore.acs_exception.exceptions import ServerException
 from flask_restful import Resource
 from flask import request
-from fn.keywords import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PARSE_ERROR, PERMISSION_DENIED, REQUEST_ERROR
+from fn.keywords import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, NO_INSTANCE_ID_FOUND, PARSE_ERROR, PERMISSION_DENIED, REQUEST_ERROR
 from fn.common import getFromRequest, getObject, toString
 from fn.req import ng, ok, er
 from fn.auth import checkDataFromToken
@@ -22,7 +22,6 @@ class EcsAction(Resource):
             return ng(NOT_ENOUGH_ARGUMENT, 'type, token')
         if not checkDataFromToken(self.token, 'group', 'admin'):
             return ng(PERMISSION_DENIED, 'Administrator\'s token is required.')
-        self.id = getIId()
         match = {
             'new': self.new,
             'delete': self.delete,
@@ -46,41 +45,47 @@ class EcsAction(Resource):
                     t3.start()   
             except:
                 return ng('Failed to open tasks.')
-            writeActionHistory(self.token, 'init')
+            writeActionHistory(self.token, id, 'init')
             return ok()
         except ServerException as e:
             return ng('init ' + REQUEST_ERROR + " Details: " + str(e))
     
     def start(self):
-        id = self.id
+        id = getIId()
+        if not id:
+            return ng(NO_INSTANCE_ID_FOUND)
         try:
             startInstance(id)
-            writeActionHistory(self.token, 'start')
+            writeActionHistory(self.token, id, 'start')
         except ServerException as e:
             return ng('start ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def stop(self):
-        id = self.id
+        id = getIId()
+        if not id:
+            return ng(NO_INSTANCE_ID_FOUND)
         try:
             startInstance(id)
-            writeActionHistory(self.token, 'stop')
+            writeActionHistory(self.token, id, 'stop')
         except ServerException as e:
             return ng('stop ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def delete(self):
-        id = self.id
+        id = getIId()
+        if not id:
+            return ng(NO_INSTANCE_ID_FOUND)
         try:
             deleteInstance(id)
-            writeActionHistory(self.token, 'delete')
+            writeActionHistory(self.token, id, 'delete')
             setIId('')
         except ServerException as e:
             return ng('delete ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def new(self):
-        id = self.id
+        id = getIId()
         if id:
             return ng('There is already an instance recorded in the database.')
         r = createInstance()
@@ -92,7 +97,7 @@ class EcsAction(Resource):
         if not id:
             return ng('Failed to get InstanceId.')
         setIId(id)
-        writeActionHistory(self.token, 'create')
+        writeActionHistory(self.token, id, 'create')
         return self.init(id)
 
 class EcsDescribe(Resource):
