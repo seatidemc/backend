@@ -59,6 +59,6 @@ api.add_resource(Auth, PREFIX + 'auth')
 if __name__ == '__main__':
     if getcfg()['production'] is True:
         from waitress import serve
-        serve(app, host='0.0.0.0', port='7093') 
+        serve(app, host='0.0.0.0', port='8080') 
     else:
         app.run(debug=True)
