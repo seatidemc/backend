@@ -17,10 +17,14 @@ ecs:
   i_chargetype: PayByTraffic
   # Internet Bandwidth (Mbps)
   i_bandwidth: 10
-  # System Disk Type: cloud_efficiency OR cloud_ssd OR cloud_essd
-  disktype: cloud_efficiency
-  # System Disk Size (GB)
-  disksize: 30
+  systemdisk:
+    # System Disk Type: cloud_efficiency OR cloud_ssd OR cloud_essd
+    type: cloud_efficiency
+    # System Disk Size (GB)
+    size: 20
+  datadisk:
+    type: cloud_efficiency
+    size: 30
   # Zone and Region (Both will affect the final price)
   zone: cn-beijing-a
   region: cn-beijing
