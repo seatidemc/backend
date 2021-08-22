@@ -138,7 +138,14 @@ class EcsDescribe(Resource):
         return ok({
             'type': ecs['type'],
             'bandwidth': ecs['i_bandwidth'],
-            'disksize': ecs['disksize'],
+            'systemdisk': {
+                'size': ecs['systemdisk']['size'],
+                'type': ecs['systemdisk']['type']
+            },
+            'datadisk': {
+                'size': ecs['datadisk']['size'],
+                'type': ecs['datadisk']['type']
+            },
             'zone': ecs['zone']
         })
     
