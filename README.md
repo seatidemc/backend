@@ -64,14 +64,14 @@ unzip ./localdep.zip # Edited Aliyun Python SDK Core & Ecs
 ```
 
 4. Initialize database. Just simply copy all the content in `.sql` and execute them in the MySQL command prompt. Please don't continue if there is any problem.
-5. Rename `config.example.yml` to `config.yml` and change its content to suit your need. **Please make sure all the items marked as *required* are filled in properly**
+5. Rename `config.example.yml` to `config.yml` and change its content to suit your need. **Please make sure all the items marked as *required* are filled in properly**.
 
 ```sh
 mv config.example.yml config.yml
 vim config.yml
 ```
 
-6. (*Optional*) If you want to test the api in your local environment, just start the development server by running `src/app.py`.
+6. (*Optional*) Boot the api by running `app.py`. The type of server opening is depend on the `production` key in `config.yml`.
 
 ```sh
 python ./app.py
