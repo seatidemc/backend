@@ -6,12 +6,13 @@ from fn.keywords import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, NO_INSTANCE_ID_FOUN
 from fn.common import getFromRequest, getObject, toString
 from fn.req import ng, ok, er
 from fn.auth import checkDataFromToken
-from models.instance import getIId, setIId, writeActionHistory, getLastInvocation, writeIp
+from models.instance import getIId, getIp, setIId, writeActionHistory, getLastInvocation, writeIp
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
 from futures import doif
 from threading import Thread as T
 from base64 import b64decode
+from urllib import request as R
 cfg = getcfg()
 
 class EcsAction(Resource):
@@ -109,7 +110,8 @@ class EcsDescribe(Resource):
             'desc-inst': self.instance,
             'desc-avai': self.available,
             'desc-stat': self.status,
-            'desc-lastinv': self.lastInvocation
+            'desc-lastinv': self.lastInvocation,
+            'desc-server': self.server
         }
         return m[ep]() #type: ignore
     
@@ -190,3 +192,23 @@ class EcsDescribe(Resource):
                 })
         except:
             return ng(PARSE_ERROR)
+        
+    def server(self):
+        ip = getIp()
+        if not ip:
+            return ng('No ip found in database.')
+        c = getObject(R.urlopen('https://mcapi.us/server/status?ip={0}&port=25565'.format(ip)).read())
+        if not c:
+            return ng('Cannot get information.')
+        online = c.get('online')
+        if not online:
+            return ok({
+                'online': False
+            })
+        return ok({
+            'online': True,
+            'version': c.get('server').get('name'),
+            'maxPlayers': c.get('players').get('max'),
+            'onlinePlayers': c.get('players').get('now')
+        })
+        

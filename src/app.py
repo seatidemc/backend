@@ -45,11 +45,17 @@ NAME = 'ecs'
 VERSION = 'v1'
 PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
-api.add_resource(EcsDescribe, PREFIX + 'describe/price', endpoint = 'desc-pric')
-api.add_resource(EcsDescribe, PREFIX + 'describe/instance', endpoint = 'desc-inst')
-api.add_resource(EcsDescribe, PREFIX + 'describe/available', endpoint = 'desc-avai')
-api.add_resource(EcsDescribe, PREFIX + 'describe/status', endpoint = 'desc-stat')
-api.add_resource(EcsDescribe, PREFIX + 'describe/last-invoke', endpoint = 'desc-lastinv')
+describe = [
+    ('describe/price', 'desc-pric'),
+    ('describe/instance', 'desc-inst'),
+    ('describe/available', 'desc-avai'),
+    ('describe/status', 'desc-stat'),
+    ('describe/last-invoke', 'desc-lastinv'),
+    ('describe/server', 'desc-server')
+]
+
+for desc in describe:
+    api.add_resource(EcsDescribe, PREFIX + desc[0], endpoint = desc[1])
 api.add_resource(EcsAction, PREFIX + 'action')
 
 NAME = 'user'
