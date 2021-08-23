@@ -5,7 +5,7 @@ def doif(de, type, cb, id=None, token=None):
     while True:
         r = describeInstanceStatus(id)
         if not r:
-            raise Exception()
+            print('Cannot get instance status.')
         r = de.decode(r)
         try:
             st = r.get('InstanceStatuses').get('InstanceStatus')
@@ -13,7 +13,7 @@ def doif(de, type, cb, id=None, token=None):
                 status = st[0].get('Status')
                 print(status)
                 if status == type:
-                    print('do running: ' + type)
+                    print('Do task for ' + type)
                     if id and token:
                         cb(id, token)
                     elif id:
@@ -25,6 +25,6 @@ def doif(de, type, cb, id=None, token=None):
                     break
                 time.sleep(3)
             else:
-                raise Exception()
+                print('No instance status found in data array.')
         except:
-            raise Exception()
+            print('Error in calling callback.')
