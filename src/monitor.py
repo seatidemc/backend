@@ -21,7 +21,7 @@ class Monitor():
                 r = getObject(r, True)
                 st = r.get('InstanceStatuses').get('InstanceStatus')
                 if len(st) == 0:
-                    print("[MONITOR] Detected nexpected deletion.")
+                    print("[MONITOR] Detected unexpected deletion.")
                     writeActionHistory(None, id, 'udelete', '_monitor')
                     setIId('')
                 else:
