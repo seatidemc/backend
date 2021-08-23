@@ -203,7 +203,9 @@ class EcsDescribe(Resource):
         online = c.get('online')
         if not online:
             return ok({
-                'online': False
+                'online': False,
+                'ip': ip,
+                'port': 25565
             })
         return ok({
             'online': True,
