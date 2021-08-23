@@ -48,3 +48,22 @@ def setIId(id):
         cur.execute("UPDATE `status` SET instance='%s' WHERE id=1" % str(id))
         d.commit()
     pass
+
+def writeIp(ip):
+    """Write ip to database."""
+    with database(DBNAME_ECS) as d:
+        cur = d.cursor()
+        cur.execute("UPDATE `status` SET ip='%s' WHERE id=1" % ip)
+        d.commit()
+    pass
+
+def getIp():
+    """Get current instance ip. Return `None` if not found."""
+    with database(DBNAME_ECS) as d:
+        cur = d.cursor()
+        cur.execute("SELECT ip FROM `status` WHERE id=1")
+        r = cur.fetchone()
+        if r:
+            if len(r) > 0:
+                return r[0]
+        return None

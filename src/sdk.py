@@ -2,7 +2,7 @@ from aliyunsdkcore.client import AcsClient
 from aliyunsdkecs.request.v20140526 import DescribeInvocationResultsRequest, StopInstanceRequest, RebootInstanceRequest, RunCommandRequest, DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
 from conf import getcfg
 from fn.common import getObject
-from models.instance import getIId, writeCommandHistory
+from models.instance import getIId, writeCommandHistory, writeIp
 
 ecs = getcfg()['ecs']
 
@@ -86,7 +86,8 @@ def createInstance():
 def allocateIp(id):
     request = AllocatePublicIpAddressRequest.AllocatePublicIpAddressRequest()
     request.set_InstanceId(id)
-    client.do_action_with_exception(request)
+    r = getObject(client.do_action_with_exception(request))
+    writeIp(r.get('IpAddress'))
     
 def startInstance(id):
     request = StartInstanceRequest.StartInstanceRequest()

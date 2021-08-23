@@ -6,7 +6,7 @@ from fn.keywords import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, NO_INSTANCE_ID_FOUN
 from fn.common import getFromRequest, getObject, toString
 from fn.req import ng, ok, er
 from fn.auth import checkDataFromToken
-from models.instance import getIId, setIId, writeActionHistory, getLastInvocation 
+from models.instance import getIId, setIId, writeActionHistory, getLastInvocation, writeIp
 from conf import getcfg
 from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
 from futures import doif
@@ -80,6 +80,7 @@ class EcsAction(Resource):
             deleteInstance(id)
             writeActionHistory(self.token, id, 'delete')
             setIId('')
+            writeIp('')
         except ServerException as e:
             return ng('delete ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()

@@ -3,7 +3,8 @@ USE ecs;
 CREATE TABLE `status` (
     `id` INT UNSIGNED NOT NULL DEFAULT 1,
     `instance` VARCHAR(50),
-    `last_updated` TIMESTAMP NOT NULL
+    `last_updated` TIMESTAMP NOT NULL,
+    `ip` VARCHAR(30)
 );
 CREATE TABLE history (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
