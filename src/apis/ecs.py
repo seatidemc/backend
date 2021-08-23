@@ -209,9 +209,9 @@ class EcsDescribe(Resource):
             })
         return ok({
             'online': True,
-            'version': c.get('server').get('name'),
+            'version': c.get('version'),
             'maxPlayers': c.get('players').get('max'),
-            'onlinePlayers': c.get('players').get('now'),
+            'onlinePlayers': c.get('players').get('online'),
             'ip': ip,
             'port': 25565
         })
