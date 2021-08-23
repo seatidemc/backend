@@ -105,8 +105,9 @@ def deploy(id, token):
         f = open('run.sh')
         cmd = f.read()
         f.close()
-    except:
-        return False
+    except Exception as e:
+        print('Cannot open run.sh: ' + str(e))
+        cmd = 'echo No run.sh content.'
     request.set_InstanceIds([id])
     request.set_CommandContent(cmd)
     request.set_Type('RunShellScript')
