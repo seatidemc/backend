@@ -197,7 +197,7 @@ class EcsDescribe(Resource):
         ip = getIp()
         if not ip:
             return ng('No ip found in database.')
-        c = getObject(R.urlopen('https://mcapi.us/server/status?ip={0}&port=25565'.format(ip)).read())
+        c = getObject(R.urlopen('https://api.mcsrvstat.us/2/{0}'.format(ip)).read())
         if not c:
             return ng('Cannot get information.')
         online = c.get('online')
