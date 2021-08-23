@@ -23,6 +23,7 @@ class User:
             return r
     
     def create(self):
+        assert self.password
         hash = generate_password_hash(self.password)
         with database(DBNAME_USER) as d:
             cur = d.cursor()
@@ -59,6 +60,7 @@ class User:
             d.commit()
     
     def checkPassword(self):
+        assert self.password
         with database(DBNAME_USER) as d:
             cur = d.cursor()
             cur.execute("SELECT password FROM `data` WHERE username='{0}'".format(self.username))
