@@ -16,7 +16,11 @@ class Monitor():
             sleep(5)
             if not id:
                 continue
-            r = describeInstanceStatus(id)
+            try:
+                r = describeInstanceStatus(id)
+            except Exception as e:
+                print(str(e))
+                continue
             try:
                 r = getObject(r, True)
                 st = r.get('InstanceStatuses').get('InstanceStatus')
