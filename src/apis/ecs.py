@@ -110,8 +110,7 @@ class EcsDescribe(Resource):
             'desc-inst': self.instance,
             'desc-avai': self.available,
             'desc-stat': self.status,
-            'desc-lastinv': self.lastInvocation,
-            'desc-server': self.server
+            'desc-lastinv': self.lastInvocation
         }
         return m[ep]() #type: ignore
     
@@ -192,27 +191,3 @@ class EcsDescribe(Resource):
                 })
         except:
             return ng(PARSE_ERROR)
-        
-    def server(self):
-        ip = getIp()
-        if not ip:
-            return ng('No ip found in database.')
-        c = getObject(R.urlopen('https://api.mcsrvstat.us/2/{0}'.format(ip)).read())
-        if not c:
-            return ng('Cannot get information.')
-        online = c.get('online')
-        if not online:
-            return ok({
-                'online': False,
-                'ip': ip,
-                'port': 25565
-            })
-        return ok({
-            'online': True,
-            'version': c.get('version'),
-            'maxPlayers': c.get('players').get('max'),
-            'onlinePlayers': c.get('players').get('online'),
-            'ip': ip,
-            'port': 25565
-        })
-        

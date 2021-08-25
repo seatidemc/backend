@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, make_response
+from apis.server import Server
 from conf import getcfg
 from flask_restful import Api
 from apis.ecs import EcsAction, EcsDescribe
@@ -51,7 +52,6 @@ describe = [
     ('describe/available', 'desc-avai'),
     ('describe/status', 'desc-stat'),
     ('describe/last-invoke', 'desc-lastinv'),
-    ('describe/server', 'desc-server')
 ]
 
 for desc in describe:
@@ -64,6 +64,18 @@ PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
 api.add_resource(UserAction, PREFIX + 'action')
 api.add_resource(Auth, PREFIX + 'auth')
+
+NAME = 'server'
+VERSION = 'v1'
+PREFIX = '/api/' + NAME + '/' + VERSION + '/'
+
+server = [
+    ('get/status', 'get-status'),
+    ('get/mods', 'get-mods')
+]
+
+for ser in server:
+    api.add_resource(Server, PREFIX + ser[0], endpoint = ser[1])
 
 if __name__ == '__main__':
     if getcfg()['production'] is True:

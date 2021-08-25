@@ -6,3 +6,4 @@ Include
 config.yml
 aliyunsdk*
 run.sh
+server.yml
