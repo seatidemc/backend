@@ -9,7 +9,8 @@ ecs = getcfg()['ecs']
 client = AcsClient(
    ecs['access_key'], 
    ecs['access_secret'],
-   ecs['region']
+   ecs['region'],
+   timeout=20
 )
 
 def describePrice():
