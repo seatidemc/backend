@@ -22,7 +22,7 @@ class Server(Resource):
             })
         m = {
             'get-status': self.status,
-            'get-mods': self.server
+            'get-server': self.server
         }
         return m[ep]() #type: ignore
     

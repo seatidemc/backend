@@ -71,7 +71,7 @@ PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
 server = [
     ('get/status', 'get-status'),
-    ('get/mods', 'get-mods')
+    ('get/server', 'get-server')
 ]
 
 for ser in server:
