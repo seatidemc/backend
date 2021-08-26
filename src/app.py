@@ -70,7 +70,6 @@ VERSION = 'v1'
 PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
 server = [
-    ('get/status', 'get-status'),
     ('get/server', 'get-server')
 ]
 

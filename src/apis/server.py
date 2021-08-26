@@ -21,22 +21,31 @@ class Server(Resource):
                 'online': False
             })
         m = {
-            'get-status': self.status,
             'get-server': self.server
         }
         return m[ep]() #type: ignore
-    
-    def status(self):
-        return ok({
-            'online': True
-        })
         
     def server(self):
         ser = getserver()
+        status = self.s.status()
+        raw = status.raw
+        mods = raw.get('forgeData').get('mods')
+        index = 0
+        for m in mods:
+            if m.get('modId') in ('minecraft', 'forge'):
+                del mods[index]
+            index += 1
         return ok({
             'mods': ser['mods'],
             'version': ser['version'],
             'since': ser['since'],
             'bestram': ser['bestram'],
-            'term': ser['term']
+            'term': ser['term'],
+            'ip': self.ip,
+            'online': True,
+            'maxPlayers': status.players.max,
+            'onlinePlayers': status.players.online,
+            'motd': raw.get('description').get('text'),
+            'onlinePlayersDetails': raw.get('players').get('sample'),
+            'rawMods': mods
         })
