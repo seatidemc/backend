@@ -14,12 +14,6 @@ class Server(Resource):
         # if not self.ip:
         #     return ng('No server ip found in database.')
         self.s = MinecraftServer(self.ip)
-        try:
-            self.s.status()
-        except Exception:
-            return ok({
-                'online': False
-            })
         m = {
             'get-server': self.server
         }
@@ -27,7 +21,19 @@ class Server(Resource):
         
     def server(self):
         ser = getserver()
-        status = self.s.status()
+        basic = {
+            'mods': ser['mods'],
+            'version': ser['version'],
+            'since': ser['since'],
+            'bestram': ser['bestram'],
+            'term': ser['term'],
+            'ip': self.ip
+        }
+        try:
+            status = self.s.status()
+        except:
+            basic['online'] = False
+            return ok(basic)
         raw = status.raw
         mods = raw.get('forgeData').get('mods')
         index = 0
@@ -35,13 +41,9 @@ class Server(Resource):
             if m.get('modId') in ('minecraft', 'forge'):
                 del mods[index]
             index += 1
-        return ok({
-            'mods': ser['mods'],
-            'version': ser['version'],
-            'since': ser['since'],
-            'bestram': ser['bestram'],
-            'term': ser['term'],
-            'ip': self.ip,
+        full = dict()
+        full.update(basic)
+        full.update({
             'online': True,
             'maxPlayers': status.players.max,
             'onlinePlayers': status.players.online,
@@ -49,3 +51,4 @@ class Server(Resource):
             'onlinePlayersDetails': raw.get('players').get('sample'),
             'rawMods': mods
         })
+        return ok(full)
