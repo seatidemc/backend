@@ -16,7 +16,7 @@ class Server(Resource):
         self.s = MinecraftServer(self.ip)
         try:
             self.s.status()
-        except timeout:
+        except Exception:
             return ok({
                 'online': False
             })
