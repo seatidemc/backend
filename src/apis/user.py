@@ -80,8 +80,11 @@ class UserAction(Resource):
         user = User(username)
         try:
             obj = getObject(toAlter, True)
-            del obj['password']
-            del obj['username']
+            try:
+                del obj['password']
+                del obj['username']
+            except:
+                pass
             user.alter(obj)
         except Exception as e:
             return er(DATABASE_ERROR, str(e))
