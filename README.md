@@ -73,7 +73,7 @@ mv config.example.yml config.yml
 vim config.yml
 ```
 
-6. (*选择性*) 利用 `python` 来启动 API。可以在 `config.yml` 里面设置是否为 `production`（生产模式），如果是则会调用 `waitress` 在 `8080` 端口打开一个生产模式服务器，如果不是则会调用 `flask` 自身在 `5000` 端口打开一个测试服务器。
+6. (*选择性*) 利用 `python` 来启动 API。可以在 `config.yml` 里面设置是否为 `production`（生产模式），如果是则会调用 `waitress` 在 `3811` 端口打开一个生产模式服务器，如果不是则会调用 `flask` 自身在 `5000` 端口打开一个测试服务器。
 
 ```sh
 python ./app.py
