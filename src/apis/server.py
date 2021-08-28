@@ -9,10 +9,9 @@ from socket import timeout
 class Server(Resource):
     def get(self):
         ep = request.endpoint
-        self.ip = '39.105.144.104'
-        # self.ip = getIp()
-        # if not self.ip:
-        #     return ng('No server ip found in database.')
+        self.ip = getIp()
+        if not self.ip:
+            return ng('No server ip found in database.')
         self.s = MinecraftServer(self.ip)
         m = {
             'get-server': self.server
