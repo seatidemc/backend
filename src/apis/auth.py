@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request
-from fn.keywords import INVALID_TOKEN, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, DATABASE_ERROR
+from fn.keywords import INVALID_TOKEN, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, DATABASE_ERROR, TOKEN_EXPIRED, TOKEN_INVALID, USER_NOT_EXISTS
 from fn.common import getFromRequest
 from fn.req import ok, er, ng
 from fn.auth import verifyToken, getToken
@@ -29,7 +29,7 @@ class Auth(Resource):
         if c is True:
             return ok()
         elif c is None:
-            return ng('Expired token.')
+            return ng(TOKEN_EXPIRED)
         else:
             return er(INVALID_TOKEN)
         
@@ -40,12 +40,12 @@ class Auth(Resource):
         user = User(self.username, password)
         try:
             if not user.exists():
-                return ng('User not exists.')
+                return ng(USER_NOT_EXISTS)
             if user.checkPassword():
                 group = user.get()['group']
                 return ok(getToken(self.username, group))
             else:
-                return ng('Not verified.')
+                return ng(TOKEN_INVALID)
         except Exception as e:
             return er(DATABASE_ERROR, str(e))
     

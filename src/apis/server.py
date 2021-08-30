@@ -2,6 +2,7 @@ from flask_restful import Resource
 from flask import request
 from conf import getserver
 from fn.req import ok, ng, er
+from fn.keywords import NO_SERVER_IP_FOUND
 from models.instance import getIp
 from mcstatus import MinecraftServer
 from socket import timeout
@@ -11,7 +12,7 @@ class Server(Resource):
         ep = request.endpoint
         self.ip = getIp()
         if not self.ip:
-            return ng('No server ip found in database.')
+            return ng(NO_SERVER_IP_FOUND)
         self.s = MinecraftServer(self.ip)
         m = {
             'get-server': self.server

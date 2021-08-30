@@ -2,7 +2,7 @@ from flask.json import JSONDecoder
 from aliyunsdkcore.acs_exception.exceptions import ServerException
 from flask_restful import Resource
 from flask import request
-from fn.keywords import INVALID_ACTION, NOT_ENOUGH_ARGUMENT, NO_INSTANCE_ID_FOUND, PARSE_ERROR, PERMISSION_DENIED, REQUEST_ERROR
+from fn.keywords import DUPLICATE_INSTANCE_CREATION, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, NO_INSTANCE_ID_FOUND, PARSE_ERROR, PERMISSION_DENIED, REQUEST_ERROR
 from fn.common import getFromRequest, getObject, toString
 from fn.req import ng, ok, er
 from fn.auth import checkDataFromToken
@@ -22,7 +22,7 @@ class EcsAction(Resource):
         if not type or not self.token:
             return ng(NOT_ENOUGH_ARGUMENT, 'type, token')
         if not checkDataFromToken(self.token, 'group', 'admin'):
-            return ng(PERMISSION_DENIED, 'Administrator\'s token is required.')
+            return ng(PERMISSION_DENIED)
         match = {
             'new': self.new,
             'delete': self.delete,
@@ -89,7 +89,7 @@ class EcsAction(Resource):
     def new(self):
         id = getIId()
         if id:
-            return ng('There is already an instance recorded in the database.')
+            return ng(DUPLICATE_INSTANCE_CREATION)
         r = createInstance()
         if not r:
             return ng('new ' + REQUEST_ERROR)
@@ -170,7 +170,7 @@ class EcsDescribe(Resource):
     def status(self):
         id = getIId()
         if not id:
-            return ng('Unable to find instance id in database.')
+            return ng(NO_INSTANCE_ID_FOUND)
         r = describeInstanceStatus(id)
         if not r:
             return ng(REQUEST_ERROR)

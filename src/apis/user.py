@@ -1,7 +1,7 @@
 from models.user import User
 from flask_restful import Resource
 from flask import request
-from fn.keywords import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT
+from fn.keywords import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, USER_ALREADY_EXISTS, USER_NOT_EXISTS
 from fn.req import er, ng, ok
 from fn.common import getFromRequest, getObject
 
@@ -30,7 +30,7 @@ class UserAction(Resource):
         user = User(username, password, email)
         try:
             if user.exists():
-                return ng('Username already exists.')
+                return ng(USER_ALREADY_EXISTS)
             user.create()
         except Exception as e:
             return er(DATABASE_ERROR, str(e))
@@ -43,7 +43,7 @@ class UserAction(Resource):
         user = User(username)
         try:
             if not user.exists():
-                return ng('User not exists.')
+                return ng(USER_NOT_EXISTS)
             user.delete()
         except Exception as e:
             return er(DATABASE_ERROR, str(e))
@@ -55,7 +55,7 @@ class UserAction(Resource):
             return er(NOT_ENOUGH_ARGUMENT, 'username')
         user = User(username)
         if not user.exists():
-            return ng('User not exists.')
+            return ng(USER_NOT_EXISTS)
         return ok(user.get())
     
     def changePassword(self):
@@ -65,7 +65,7 @@ class UserAction(Resource):
             return er(NOT_ENOUGH_ARGUMENT, 'username, newPassword')
         user = User(username)
         if not user.exists():
-            return ng('User not exists.')
+            return ng(USER_NOT_EXISTS)
         try:
             user.changePassword(newPassword)
         except Exception as e:

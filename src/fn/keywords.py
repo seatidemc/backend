@@ -7,6 +7,12 @@ INVALID_TOKEN = 'Invalid token.'
 INVALID_ACTION = 'Invalid action.'
 PERMISSION_DENIED = 'Permission denied.'
 NO_INSTANCE_ID_FOUND = 'No instance id found in database.'
+NO_SERVER_IP_FOUND = 'No server ip found in database.'
+DUPLICATE_INSTANCE_CREATION = 'There is already an instance recorded in the database.'
+USER_ALREADY_EXISTS ='Username already exists.'
+USER_NOT_EXISTS = 'User not exists.'
+TOKEN_EXPIRED = 'Expired token.'
+TOKEN_INVALID = 'Not verified.'
 
 # dbname
 DBNAME_ECS = 'ecs'
