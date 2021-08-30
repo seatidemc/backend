@@ -8,7 +8,7 @@ from fn.req import ng, ok, er
 from fn.auth import checkDataFromToken
 from models.instance import getIId, getIp, setIId, writeActionHistory, getLastInvocation, writeIp
 from conf import getcfg
-from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult
+from sdk import allocateIp, deleteInstance, deploy, startInstance, createInstance, describeAvailable, describeInstanceStatus, describePrice, describeInvocationResult, stopInstance
 from futures import doif
 from threading import Thread as T
 from base64 import b64decode
@@ -67,7 +67,7 @@ class EcsAction(Resource):
         if not id:
             return ng(NO_INSTANCE_ID_FOUND)
         try:
-            startInstance(id)
+            stopInstance(id)
             writeActionHistory(self.token, id, 'stop')
         except ServerException as e:
             return ng('stop ' + REQUEST_ERROR + " Details: " + str(e))
