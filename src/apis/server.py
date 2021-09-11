@@ -11,9 +11,8 @@ class Server(Resource):
     def get(self):
         ep = request.endpoint
         self.ip = getIp()
-        if not self.ip:
-            return ng(NO_SERVER_IP_FOUND)
-        self.s = MinecraftServer(self.ip)
+        if self.ip:
+            self.s = MinecraftServer(self.ip)
         m = {
             'get-server': self.server
         }
@@ -27,6 +26,7 @@ class Server(Resource):
             'since': ser['since'],
             'bestram': ser['bestram'],
             'term': ser['term'],
+            'created': True if self.ip else False,
             'ip': self.ip
         }
         try:
