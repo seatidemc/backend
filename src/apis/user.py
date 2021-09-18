@@ -2,7 +2,7 @@ from fn.auth import checkDataFromToken
 from models.user import User, getUserCount, listUsers
 from flask_restful import Resource
 from flask import request
-from fn.keywords import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PERMISSION_DENIED, USER_ALREADY_EXISTS, USER_NOT_EXISTS
+from fn.keywords import DATABASE_ERROR, ILLEGAL_OPERATION, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PERMISSION_DENIED, USER_ALREADY_EXISTS, USER_NOT_EXISTS
 from fn.req import er, ng, ok
 from fn.common import getFromArgs, getFromRequest, getObject
 
@@ -69,6 +69,8 @@ class UserAction(Resource):
         usernames = getFromRequest(request, 'usernames')
         if not usernames:
             return er(NOT_ENOUGH_ARGUMENT, 'usernames')
+        if 'admin' in usernames:
+            return er(ILLEGAL_OPERATION, 'You can\'t delete admin :)')
         if len(usernames) == 0:
             return er(NOT_ENOUGH_ARGUMENT, 'usernames')
         if len(usernames) == 1:
@@ -123,6 +125,8 @@ class UserAction(Resource):
     
     def alter(self):
         username = getFromRequest(request, 'username')
+        if username == 'admin':
+            return er(ILLEGAL_OPERATION, 'You can\'t alter admin :)')
         toAlter = getFromRequest(request, 'toAlter')
         if not toAlter or not username:
             return er(NOT_ENOUGH_ARGUMENT, 'username, toAlter')

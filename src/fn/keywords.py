@@ -13,6 +13,7 @@ USER_ALREADY_EXISTS ='Username already exists.'
 USER_NOT_EXISTS = 'User not exists.'
 TOKEN_EXPIRED = 'Expired token.'
 TOKEN_INVALID = 'Not verified.'
+ILLEGAL_OPERATION = 'Illegal operation.'
 
 # dbname
 DBNAME_ECS = 'ecs'
