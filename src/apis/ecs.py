@@ -50,7 +50,7 @@ class EcsAction(Resource):
             writeActionHistory(self.token, id, 'init')
             return ok()
         except ServerException as e:
-            return ng('init ' + REQUEST_ERROR + " Details: " + str(e))
+            return ng('INIT ' + REQUEST_ERROR + " Details: " + str(e))
     
     def start(self):
         id = getIId()
@@ -60,7 +60,7 @@ class EcsAction(Resource):
             startInstance(id)
             writeActionHistory(self.token, id, 'start')
         except ServerException as e:
-            return ng('start ' + REQUEST_ERROR + " Details: " + str(e))
+            return ng('START ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def stop(self):
@@ -71,7 +71,7 @@ class EcsAction(Resource):
             stopInstance(id)
             writeActionHistory(self.token, id, 'stop')
         except ServerException as e:
-            return ng('stop ' + REQUEST_ERROR + " Details: " + str(e))
+            return ng('STOP ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def delete(self):
@@ -84,20 +84,22 @@ class EcsAction(Resource):
             setIId('')
             writeIp('')
         except ServerException as e:
-            return ng('delete ' + REQUEST_ERROR + " Details: " + str(e))
+            return ng('DELETE ' + REQUEST_ERROR + " Details: " + str(e))
         return ok()
     
     def new(self):
         id = getIId()
         if id:
             return ng(DUPLICATE_INSTANCE_CREATION)
+        setIId("OCCUPIED")
         r = createInstance()
         if not r:
-            return ng('new ' + REQUEST_ERROR)
+            return ng('NEW ' + REQUEST_ERROR)
         de = JSONDecoder()
         r = de.decode(r)
         id = r.get('InstanceId')
         if not id:
+            setIId('')
             return ng('Failed to get InstanceId.')
         setIId(id)
         writeActionHistory(self.token, id, 'create')
