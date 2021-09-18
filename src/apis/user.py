@@ -1,15 +1,20 @@
+from fn.auth import checkDataFromToken
 from models.user import User
 from flask_restful import Resource
 from flask import request
-from fn.keywords import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, USER_ALREADY_EXISTS, USER_NOT_EXISTS
+from fn.keywords import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PERMISSION_DENIED, USER_ALREADY_EXISTS, USER_NOT_EXISTS
 from fn.req import er, ng, ok
 from fn.common import getFromRequest, getObject
 
 class UserAction(Resource):
     def post(self):
         type = getFromRequest(request, 'type')
-        if not type:
+        token = getFromRequest(request, 'token')
+        if not type or not token:
             return er(NOT_ENOUGH_ARGUMENT)
+        if not type is 'create':
+            if not checkDataFromToken(token, 'group', 'admin'):
+                return ng(PERMISSION_DENIED)
         match = {
             'create': self.create,
             'delete': self.delete,
