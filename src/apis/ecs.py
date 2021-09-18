@@ -21,8 +21,9 @@ class EcsAction(Resource):
         self.token = getFromRequest(request, 'token')
         if not type or not self.token:
             return ng(NOT_ENOUGH_ARGUMENT, 'type, token')
-        if not checkDataFromToken(self.token, 'group', 'admin'):
-            return ng(PERMISSION_DENIED)
+        if type != "new":
+            if not checkDataFromToken(self.token, 'group', 'admin'):
+                return ng(PERMISSION_DENIED)
         match = {
             'new': self.new,
             'delete': self.delete,
