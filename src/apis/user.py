@@ -1,18 +1,42 @@
 from fn.auth import checkDataFromToken
-from models.user import User
+from models.user import User, getUserCount, listUsers
 from flask_restful import Resource
 from flask import request
 from fn.keywords import DATABASE_ERROR, INVALID_ACTION, NOT_ENOUGH_ARGUMENT, PERMISSION_DENIED, USER_ALREADY_EXISTS, USER_NOT_EXISTS
 from fn.req import er, ng, ok
-from fn.common import getFromRequest, getObject
+from fn.common import getFromArgs, getFromRequest, getObject
+
+class UserInformation(Resource):
+    def get(self):
+        ep = request.endpoint
+        self.args = request.args
+        m = {
+            'get-all': self.getAll,
+            'get-count': self.getCount,
+        }
+        return m[ep]() #type:ignore
+      
+    def getAll(self):
+        page = getFromArgs(self.args, 'page')
+        pagin = getFromArgs(self.args, 'pagin')
+        if (not page and page is not 0) or not pagin:
+            return er(NOT_ENOUGH_ARGUMENT, 'page, pagin')
+        r = listUsers(page, pagin)
+        return ok(r)
+    
+    def getCount(self):
+        r = getUserCount()
+        return ok(r)
 
 class UserAction(Resource):
     def post(self):
         type = getFromRequest(request, 'type')
         token = getFromRequest(request, 'token')
-        if not type or not token:
-            return er(NOT_ENOUGH_ARGUMENT)
-        if not type is 'create':
+        if not type:
+            return er(NOT_ENOUGH_ARGUMENT, 'type')
+        if type != 'create':
+            if not token:
+                return er(NOT_ENOUGH_ARGUMENT, 'token')
             if not checkDataFromToken(token, 'group', 'admin'):
                 return ng(PERMISSION_DENIED)
         match = {
@@ -42,17 +66,37 @@ class UserAction(Resource):
         return ok()
         
     def delete(self):
-        username = getFromRequest(request, 'username')
-        if not username:
-            return er(NOT_ENOUGH_ARGUMENT, 'username')
-        user = User(username)
-        try:
-            if not user.exists():
-                return ng(USER_NOT_EXISTS)
-            user.delete()
-        except Exception as e:
-            return er(DATABASE_ERROR, str(e))
-        return ok()
+        usernames = getFromRequest(request, 'usernames')
+        if not usernames:
+            return er(NOT_ENOUGH_ARGUMENT, 'usernames')
+        if len(usernames) == 0:
+            return er(NOT_ENOUGH_ARGUMENT, 'usernames')
+        if len(usernames) == 1:
+            user = User(usernames[0])
+            try:
+                if not user.exists():
+                    return ng(USER_NOT_EXISTS)
+                user.delete()
+            except Exception as e:
+                return er(DATABASE_ERROR, str(e))
+            return ok()
+        user = None
+        deleted = 0
+        error = False
+        for u in usernames:
+            user = User(u)
+            try:
+                if user.exists():
+                    user.delete()
+                    deleted += 1
+            except:
+                error = True
+                continue
+        return ok({
+            'deleted': deleted,
+            'error': error
+        })
+            
     
     def gets(self):
         username = getFromRequest(request, 'username')
@@ -84,13 +128,12 @@ class UserAction(Resource):
             return er(NOT_ENOUGH_ARGUMENT, 'username, toAlter')
         user = User(username)
         try:
-            obj = getObject(toAlter, True)
             try:
-                del obj['password']
-                del obj['username']
+                del toAlter['password']
+                del toAlter['username']
             except:
                 pass
-            user.alter(obj)
+            user.alter(toAlter)
         except Exception as e:
             return er(DATABASE_ERROR, str(e))
         return ok()

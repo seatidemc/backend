@@ -68,3 +68,24 @@ class User:
             assert r
             hash = r[0]
             return check_password_hash(hash, self.password)
+
+def getUserCount():
+    with database(DBNAME_USER) as d:
+        cur = d.cursor(DictCursor)
+        cur.execute("SELECT COUNT(*) FROM `data`")
+        r = cur.fetchone()
+        return r['COUNT(*)'] #type:ignore
+
+def listUsers(page, pagin):
+    """List user data from table. Parameter `page` starts with `0`."""
+    with database(DBNAME_USER) as d:
+        cur = d.cursor(DictCursor)
+        cur.execute("SELECT * FROM `data` ORDER BY `id` ASC LIMIT {0},{1}".format(page * pagin, pagin))
+        r = cur.fetchall()
+        if (len(r) == 0):
+            return []
+        for i in range(len(r)):
+            del r[i]['password']
+            del r[i]['last_updated']
+            r[i]['created_at'] = toFormattedTime(r[i]['created_at'])
+        return r

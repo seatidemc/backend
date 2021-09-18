@@ -4,7 +4,7 @@ from conf import getcfg
 from flask_restful import Api
 from apis.ecs import EcsAction, EcsDescribe
 from apis.auth import Auth
-from apis.user import UserAction
+from apis.user import UserAction, UserInformation
 from monitor import Monitor
 
 app = Flask(__name__)
@@ -64,6 +64,8 @@ PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
 api.add_resource(UserAction, PREFIX + 'action')
 api.add_resource(Auth, PREFIX + 'auth')
+api.add_resource(UserInformation, PREFIX + 'get/all', endpoint = 'get-all')
+api.add_resource(UserInformation, PREFIX + 'get/count', endpoint = 'get-count')
 
 NAME = 'server'
 VERSION = 'v1'
