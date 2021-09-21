@@ -6,7 +6,7 @@ def getFromArgs(args, name: str):
     """A safe approach to getting a value from `args` object."""
     try:
         v = args[name]
-        if v is '0':
+        if v == '0':
             return 0
         if v.isdigit():
             return int(v)
