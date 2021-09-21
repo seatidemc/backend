@@ -16,6 +16,8 @@ class Monitor():
             sleep(5)
             if not id:
                 continue
+            if id == 'OCCUPIED':
+                continue
             try:
                 r = describeInstanceStatus(id)
             except Exception as e:
