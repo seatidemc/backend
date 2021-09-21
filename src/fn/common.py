@@ -17,7 +17,12 @@ def getFromArgs(args, name: str):
 def getFromRequest(request, name: str):
     """A safe approach to getting a value from `request` object."""
     try:
-        return request.get_json(force=True)[name]
+        return request.form[name]
+    except KeyError:
+        try:
+            return request.get_json(force=True)[name]
+        except:
+            return None
     except:
         return None
 
