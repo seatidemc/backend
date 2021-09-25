@@ -24,7 +24,5 @@ def doif(de, type, cb, id=None, token=None):
                         cb()
                     break
                 time.sleep(3)
-            else:
-                print('No instance status found in data array.')
         except:
             print('Error in calling callback.')
