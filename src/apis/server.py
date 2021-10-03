@@ -14,7 +14,8 @@ class Server(Resource):
         if self.ip:
             self.s = MinecraftServer(self.ip)
         m = {
-            'get-server': self.server
+            'get-server': self.server,
+            'get-ip': self.getIp
         }
         return m[ep]() #type: ignore
         
@@ -52,3 +53,6 @@ class Server(Resource):
             'rawMods': mods
         })
         return ok(full)
+    
+    def getIp(self):
+        return ok(self.ip)

@@ -72,7 +72,8 @@ VERSION = 'v1'
 PREFIX = '/api/' + NAME + '/' + VERSION + '/'
 
 server = [
-    ('get/server', 'get-server')
+    ('get/server', 'get-server'),
+    ('get/ip', 'get-ip')
 ]
 
 for ser in server:
