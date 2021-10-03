@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, make_response
-from apis.server import Server
+from apis.server import ServerAction, ServerInformation
 from conf import getcfg
 from flask_restful import Api
 from apis.ecs import EcsAction, EcsDescribe
@@ -77,7 +77,9 @@ server = [
 ]
 
 for ser in server:
-    api.add_resource(Server, PREFIX + ser[0], endpoint = ser[1])
+    api.add_resource(ServerInformation, PREFIX + ser[0], endpoint = ser[1])
+
+api.add_resource(ServerAction, PREFIX + 'action')
 
 if __name__ == '__main__':
     if getcfg()['production'] is True:

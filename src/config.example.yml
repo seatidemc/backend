@@ -38,3 +38,12 @@ ecs:
 deploy: false
 # Use a secret string (any value) to encode login tokens
 secret: ~
+# RCON settings
+rcon:
+  # Port for RCON. Note: Probably not the sever ip, set in server.properties.
+  port: ~
+  # Password for RCON. Set in server.properties.
+  password: ~
+# The command to launch server.
+# eg: chmod +x ./boot && ./boot
+launch-command: ~

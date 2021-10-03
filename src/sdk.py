@@ -116,6 +116,7 @@ def deploy(id, token):
     request.set_Timeout(99999)
     r = getObject(client.do_action_with_exception(request))
     writeCommandHistory(token, r.get('CommandId'), r.get('InvokeId'))
+    pass
     
 def rebootInstance(id):
     request = RebootInstanceRequest.RebootInstanceRequest()
@@ -135,3 +136,13 @@ def describeInvocationResult(id):
     request.set_InvokeId(id)
     request.set_InstanceId(iid)
     return client.do_action_with_exception(request)
+
+def runCommand(id, token, cmd, timeout = 600):
+    request = RunCommandRequest.RunCommandRequest()
+    request.set_InstanceIds([id])
+    request.set_CommandContent(cmd)
+    request.set_Type('RunShellScript')
+    request.set_Timeout(timeout)
+    r = getObject(client.do_action_with_exception(request))
+    writeCommandHistory(token, r.get('CommandId'), r.get('InvokeId'))
+    pass
