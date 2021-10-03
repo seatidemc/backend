@@ -30,10 +30,7 @@ class Monitor():
                 try:
                     deleteInstance(id)
                     writeActionHistory(None, id, 'sdelete', '_monitor')
-                    continue
                 except Exception as e:
-                    self.serverCrashTimer = 50
-                    print("Error in serverCrashMonitor: Unable to delete instance.")
                     continue
             server = MinecraftServer(ip)
             try:
