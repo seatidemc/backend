@@ -42,7 +42,8 @@
 
 ## 部署
 
-**需要 Python 3.8 以上版本和 MySQL 数据库**，低于 3.8（不包括）则无法运行。
+- Python 3.8+
+- MySQL
 
 1. 下载本项目
 
@@ -50,7 +51,7 @@
 git clone https://github.com/seatidemc/backend.git
 ```
 
-2. (*建议，选择性*) 创建虚拟环境
+2. 可选，创建虚拟环境
 
 ```sh
 cd backend
@@ -73,7 +74,7 @@ mv config.example.yml config.yml
 vim config.yml
 ```
 
-6. (*选择性*) 利用 `python` 来启动 API。可以在 `config.yml` 里面设置是否为 `production`（生产模式），如果是则会调用 `waitress` 在 `3811` 端口打开一个生产模式服务器，如果不是则会调用 `flask` 自身在 `5000` 端口打开一个测试服务器。
+6. 可选，利用 `python` 来启动 API。可以在 `config.yml` 里面设置是否为 `production`（生产模式），如果是则会调用 `waitress` 在 `3811` 端口打开一个生产模式服务器，如果不是则会调用 `flask` 自身在 `5000` 端口打开一个测试服务器。
 
 ```sh
 python ./app.py
