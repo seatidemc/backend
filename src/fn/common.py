@@ -37,3 +37,6 @@ def toString(a):
 
 def toFormattedTime(dt: datetime.datetime):
     return dt.strftime(TIME_FORMAT)
+
+def ifdef(a, default = None):
+    return a if a else default

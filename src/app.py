@@ -85,6 +85,9 @@ VERSION = 'v1'
 PREFIX  = '/api/' + NAME + '/' + VERSION + '/'
 
 api.add_resource(InfoDescribe, PREFIX + 'describe/balance', endpoint = 'desc-balance')
+api.add_resource(InfoDescribe, PREFIX + 'describe/fund', endpoint = 'desc-fund')
+api.add_resource(InfoDescribe, PREFIX + 'describe/billing', endpoint = 'desc-billing')
+api.add_resource(InfoDescribe, PREFIX + 'search/fund', endpoint = 'search-fund')
 
 if __name__ == '__main__':
     if getcfg()['production'] is True:

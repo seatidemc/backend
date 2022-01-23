@@ -1,5 +1,6 @@
 # error info
 NOT_ENOUGH_ARGUMENT = 'Not enough argument.'
+INVALID_ARGUMENT = 'Invalid argument.'
 DATABASE_ERROR = 'Database error.'
 REQUEST_ERROR = 'Request error.'
 PARSE_ERROR = 'Parse error.'

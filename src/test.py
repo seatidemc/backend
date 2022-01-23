@@ -1,3 +1,3 @@
-from sdk import describeBalance
+from sdk import describeMonthlyBilling
 
-describeBalance()
+print(describeMonthlyBilling("2022", "01"))

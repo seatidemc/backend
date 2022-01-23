@@ -1,4 +1,5 @@
 from aliyunsdkcore.client import AcsClient
+from alibabacloud_bssopenapi20171214 import models as bssModel
 from alibabacloud_bssopenapi20171214.client import Client as BssClient
 from alibabacloud_tea_openapi import models as apiModel
 from aliyunsdkecs.request.v20140526 import DescribeInvocationResultsRequest, StopInstanceRequest, RebootInstanceRequest, RunCommandRequest, DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
@@ -27,6 +28,35 @@ def describeBalance():
     result = bal.body.data.available_cash_amount
     return result
 
+def describeTransaction(maxResults, pageNum = 1, startDate = None, endDate = None):
+    try:
+        if startDate is None: startDate = "2021-02-01T00:00:00Z"
+        trans = bssClient.query_account_transactions(bssModel.QueryAccountTransactionsRequest(page_num=pageNum, page_size=maxResults, create_time_start=startDate, create_time_end=endDate))
+        assert trans.body != None and trans.body.data != None and trans.body.data.account_transactions_list != None
+    except Exception as e:
+        return None
+    result = [{'amount': t['Amount'], 'type': t['Remarks'], 'date': t['TransactionTime'], 'flow': t['TransactionFlow']} for t in trans.body.data.account_transactions_list.to_map()['AccountTransactionsList']]
+    return {
+        'result': result,
+        'total': trans.body.data.total_count
+    }
+    
+def describeDailyBilling(year: str, month: str, day: str):
+    try:
+        result = bssClient.query_account_bill(bssModel.QueryAccountBillRequest(billing_cycle=year + '-' + month, billing_date=year + '-' + month + '-' + day, granularity='DAILY'))
+        assert result.body != None and result.body.data != None and result.body.data.items != None
+        return result.body.data.items.to_map()['Item'][0]['PaymentAmount']
+    except:
+        return None
+    
+def describeMonthlyBilling(year: str, month: str):
+    try:
+        result = bssClient.query_account_bill(bssModel.QueryAccountBillRequest(billing_cycle=year + '-' + month))
+        assert result.body != None and result.body.data != None and result.body.data.items != None
+        return result.body.data.items.to_map()['Item'][0]['PaymentAmount']
+    except:
+        return None
+    
 def describePrice():
     request = DescribePriceRequest.DescribePriceRequest()
     request.set_InstanceType(ecs['type'])
