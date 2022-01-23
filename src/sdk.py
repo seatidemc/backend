@@ -1,17 +1,31 @@
 from aliyunsdkcore.client import AcsClient
+from alibabacloud_bssopenapi20171214.client import Client as BssClient
+from alibabacloud_tea_openapi import models as apiModel
 from aliyunsdkecs.request.v20140526 import DescribeInvocationResultsRequest, StopInstanceRequest, RebootInstanceRequest, RunCommandRequest, DeleteInstanceRequest, StartInstanceRequest, AllocatePublicIpAddressRequest, CreateInstanceRequest, DescribePriceRequest, DescribeAvailableResourceRequest, DescribeInstanceStatusRequest
 from conf import getcfg
 from fn.common import getObject
 from models.instance import getIId, writeCommandHistory, writeIp
 
 ecs = getcfg()['ecs']
+bss = apiModel.Config(access_key_id=ecs['access_key'], access_key_secret=ecs['access_secret'], endpoint='business.aliyuncs.com')
 
-client = AcsClient(
+acsClient = AcsClient(
    ecs['access_key'], 
    ecs['access_secret'],
    ecs['region'],
    timeout=20
 )
+
+bssClient = BssClient(bss)
+
+def describeBalance():
+    try:
+        bal = bssClient.query_account_balance()
+        assert bal.body != None and bal.body.data != None
+    except:
+        return None
+    result = bal.body.data.available_cash_amount
+    return result
 
 def describePrice():
     request = DescribePriceRequest.DescribePriceRequest()
@@ -25,7 +39,7 @@ def describePrice():
     request.set_DataDisk1Size(ecs['datadisk']['size'])
     request.set_ZoneId(ecs['zone'])
     request.set_SpotStrategy(ecs['strategy'])
-    response = client.do_action_with_exception(request)
+    response = acsClient.do_action_with_exception(request)
     try:
         s = str(response, encoding='utf-8') #type: ignore
         return s
@@ -41,7 +55,7 @@ def describeAvailable():
     request.set_ZoneId(ecs['zone'])
     request.set_SpotStrategy(ecs['strategy'])
     request.set_DestinationResource('InstanceType')
-    response = client.do_action_with_exception(request)
+    response = acsClient.do_action_with_exception(request)
     try:
         s = str(response, encoding='utf-8') #type: ignore
         return s
@@ -52,7 +66,7 @@ def describeAvailable():
 def describeInstanceStatus(id):
     request = DescribeInstanceStatusRequest.DescribeInstanceStatusRequest()
     request.set_InstanceIds([id])
-    response = client.do_action_with_exception(request)
+    response = acsClient.do_action_with_exception(request)
     try:
         s = str(response, encoding='utf-8') #type: ignore
         return s
@@ -77,7 +91,7 @@ def createInstance():
     if ecs['password']:
         request.set_Password(ecs['password'])
     request.set_SpotPriceLimit(0)
-    response = client.do_action_with_exception(request)
+    response = acsClient.do_action_with_exception(request)
     try:
         s = str(response, encoding='utf-8') #type: ignore
     except:
@@ -87,19 +101,19 @@ def createInstance():
 def allocateIp(id):
     request = AllocatePublicIpAddressRequest.AllocatePublicIpAddressRequest()
     request.set_InstanceId(id)
-    r = getObject(client.do_action_with_exception(request))
+    r = getObject(acsClient.do_action_with_exception(request))
     writeIp(r.get('IpAddress'))
     
 def startInstance(id):
     request = StartInstanceRequest.StartInstanceRequest()
     request.set_InstanceId(id)
-    client.do_action_with_exception(request)
+    acsClient.do_action_with_exception(request)
     
 def deleteInstance(id):
     request = DeleteInstanceRequest.DeleteInstanceRequest()
     request.set_Force(True)
     request.set_InstanceId(id)
-    client.do_action_with_exception(request)
+    acsClient.do_action_with_exception(request)
     
 def deploy(id, token):
     request = RunCommandRequest.RunCommandRequest()
@@ -114,19 +128,19 @@ def deploy(id, token):
     request.set_CommandContent(cmd)
     request.set_Type('RunShellScript')
     request.set_Timeout(99999)
-    r = getObject(client.do_action_with_exception(request))
+    r = getObject(acsClient.do_action_with_exception(request))
     writeCommandHistory(token, r.get('CommandId'), r.get('InvokeId'))
     pass
     
 def rebootInstance(id):
     request = RebootInstanceRequest.RebootInstanceRequest()
     request.set_InstanceId(id)
-    client.do_action_with_exception(request)
+    acsClient.do_action_with_exception(request)
     
 def stopInstance(id):
     request = StopInstanceRequest.StopInstanceRequest()
     request.set_InstanceId(id)
-    client.do_action_with_exception(request)
+    acsClient.do_action_with_exception(request)
     
 def describeInvocationResult(id):
     request = DescribeInvocationResultsRequest.DescribeInvocationResultsRequest()
@@ -135,7 +149,7 @@ def describeInvocationResult(id):
         return None
     request.set_InvokeId(id)
     request.set_InstanceId(iid)
-    return client.do_action_with_exception(request)
+    return acsClient.do_action_with_exception(request)
 
 def runCommand(id, token, cmd, timeout = 600):
     request = RunCommandRequest.RunCommandRequest()
@@ -143,6 +157,6 @@ def runCommand(id, token, cmd, timeout = 600):
     request.set_CommandContent(cmd)
     request.set_Type('RunShellScript')
     request.set_Timeout(timeout)
-    r = getObject(client.do_action_with_exception(request))
+    r = getObject(acsClient.do_action_with_exception(request))
     writeCommandHistory(token, r.get('CommandId'), r.get('InvokeId'))
     pass

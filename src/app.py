@@ -5,6 +5,7 @@ from flask_restful import Api
 from apis.ecs import EcsAction, EcsDescribe
 from apis.auth import Auth
 from apis.user import UserAction, UserInformation
+from apis.info import InfoDescribe
 from monitor import Monitor
 
 app = Flask(__name__)
@@ -78,6 +79,12 @@ server = [
 
 for ser in server:
     api.add_resource(ServerInformation, PREFIX + ser[0], endpoint = ser[1])
+    
+NAME = 'info'
+VERSION = 'v1'
+PREFIX  = '/api/' + NAME + '/' + VERSION + '/'
+
+api.add_resource(InfoDescribe, PREFIX + 'describe/balance', endpoint = 'desc-balance')
 
 if __name__ == '__main__':
     if getcfg()['production'] is True:
