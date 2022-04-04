@@ -25,8 +25,8 @@ class Monitor():
             if not id or not ip :
                 self.serverCrashTimer = 0
                 continue
-            if self.serverCrashTimer >= 60:
-                # if retries go over 60 times, delete the instance
+            if self.serverCrashTimer >= 120:
+                # if retries go over 120 times, delete the instance
                 try:
                     deleteInstance(id)
                     writeActionHistory(None, id, 'sdelete', '_monitor')
