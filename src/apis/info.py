@@ -23,7 +23,7 @@ class InfoDescribe(Resource):
         return ok(bal)
     
     def fund(self):
-        pageNum = ifdef(request.args.get('pageNum'), 1)
+        pageNum = int(ifdef(request.args.get('pageNum'), 1))
         maxResult = ifdef(request.args.get('maxResult'), 10)
         startDate = ifdef(request.args.get('startDate'))
         endDate = ifdef(request.args.get('endDate'))
