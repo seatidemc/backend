@@ -14,7 +14,7 @@ def translate(bold, italic, color, text):
         result = '§l' + result;
     if italic:
         result = '§o' + result;
-    return result;
+    return result + "§r";
 
 class ServerInformation(Resource):
     def get(self):
