@@ -11,6 +11,3 @@ def load(name):
 
 def getcfg():
     return load('config.yml')
-
-def getserver():
-    return load('server.yml')
