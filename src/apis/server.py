@@ -9,11 +9,11 @@ colorDict = {'dark_gray': '8', 'gold': '6', 'green': 'a', 'aqua': 'b', 'light_pu
 def translate(bold, italic, color, text):
     result = text
     if colorDict.get(color) != None:
-        result = '&' + str(colorDict.get(color)) + result;
+        result = '§' + str(colorDict.get(color)) + result;
     if bold: 
-        result = '&l' + result;
+        result = '§l' + result;
     if italic:
-        result = '&o' + result;
+        result = '§o' + result;
     return result;
 
 class ServerInformation(Resource):
